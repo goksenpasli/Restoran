@@ -93,6 +93,23 @@ namespace Restoran.ViewModel
                 }
             }, parameter => SeçiliMasa?.Dolu == false && Siparişler?.Sipariş?.Any() == true);
 
+            MasaEkSiparişKaydet = new RelayCommand<object>(parameter =>
+            {
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "İlave Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                {
+                    if (parameter is Siparişler siparişler)
+                    {
+                        foreach (Sipariş item in Siparişler.Sipariş)
+                        {
+                            siparişler.Sipariş.Add(item);
+                        }
+                        DatabaseSave.Execute(null);
+                        Siparişler = new();
+                        Growl.Success("İlave Sipariş Kaydedildi.");
+                    }
+                }
+            }, parameter => SeçiliMasa?.Dolu == true && Siparişler?.Sipariş?.Any() == true);
+
             SiparişTahsilEt = new RelayCommand<object>(parameter =>
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
@@ -166,6 +183,8 @@ namespace Restoran.ViewModel
         public RelayCommand<object> DatabaseSave { get; }
 
         public int En { get; set; } = 1;
+
+        public RelayCommand<object> MasaEkSiparişKaydet { get; }
 
         public RelayCommand<object> MasaKaydet { get; }
 
