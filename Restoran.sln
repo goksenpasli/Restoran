@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restoran", "Restoran\Restoran.csproj", "{DEF801F2-BBDC-4D96-99F4-AAAE77F1AA44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEF801F2-BBDC-4D96-99F4-AAAE77F1AA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF801F2-BBDC-4D96-99F4-AAAE77F1AA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF801F2-BBDC-4D96-99F4-AAAE77F1AA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF801F2-BBDC-4D96-99F4-AAAE77F1AA44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65F05229-4392-4DAC-8341-7D4CB2EFCB8C}
+	EndGlobalSection
+EndGlobal
