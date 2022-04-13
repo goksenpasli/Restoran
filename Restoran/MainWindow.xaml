@@ -7,9 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:Restoran.ViewModel" Title="Restoran"
     d:DataContext="{d:DesignInstance Type={x:Type viewmodel:MainVewModel}}"
-    d:Height="450" d:Width="800" hc:WindowAttach.IsDragElement="True"
-    UseLayoutRounding="True" WindowStartupLocation="CenterScreen" WindowState="Maximized"
-    mc:Ignorable="d">
+    d:Height="450" d:Width="1024" hc:WindowAttach.IsDragElement="True"
+    ShowTitle="False" UseLayoutRounding="True" WindowStartupLocation="CenterScreen"
+    WindowState="Maximized" mc:Ignorable="d">
     <hc:Window.NonClientAreaContent>
         <StackPanel VerticalAlignment="Stretch" Orientation="Horizontal">
             <hc:TransitioningContentControl TransitionMode="Right2LeftWithFade">
@@ -64,7 +64,9 @@
                                             Text="{Binding Tarih, StringFormat=\{0:g\}}" />
                                         <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
                                             <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
-                                                IsReadOnly="True" ValueFormat="C"
+                                                IsReadOnly="True"
+                                                Style="{hc:StaticResource NumericUpDownExtend}"
+                                                ValueFormat="C"
                                                 Value="{Binding ToplamTutar}" />
                                         </CheckBox>
                                         <Button x:Name="BtnTahsil"
@@ -104,6 +106,7 @@
                                                     </Grid.RowDefinitions>
                                                     <hc:NumericUpDown IsEnabled="{Binding IsEnabled, ElementName=BtnÜrün}"
                                                         IsReadOnly="False" Minimum="1"
+                                                        Style="{hc:StaticResource NumericUpDownExtend}"
                                                         Value="{Binding SiparişAdet}" />
                                                     <Button x:Name="BtnÜrün" Grid.Row="1" Height="110"
                                                         HorizontalAlignment="Stretch"
@@ -158,14 +161,15 @@
                                 <HeaderedContentControl Header="ÜRÜN ADI">
                                     <TextBox Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
                                 </HeaderedContentControl>
-                                <HeaderedContentControl Header="FİYAT">
-                                    <hc:NumericUpDown DecimalPlaces="2" Minimum="1" ValueFormat="C"
-                                        Value="{Binding Ürün.Fiyat, UpdateSourceTrigger=PropertyChanged}" />
-                                </HeaderedContentControl>
-                                <HeaderedContentControl Header="ADET">
-                                    <hc:NumericUpDown DecimalPlaces="0" Minimum="1"
-                                        Value="{Binding Ürün.Adet, UpdateSourceTrigger=PropertyChanged}" />
-                                </HeaderedContentControl>
+                                <hc:NumericUpDown hc:InfoElement.Title="FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                    Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    ValueFormat="C"
+                                    Value="{Binding Ürün.Fiyat, UpdateSourceTrigger=PropertyChanged}" />
+                                <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                    Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    Value="{Binding Ürün.Adet, UpdateSourceTrigger=PropertyChanged}" />
                                 <HeaderedContentControl Header="ÜRÜN RESİM">
                                     <Button HorizontalAlignment="Stretch"
                                         Command="{Binding ÜrünResimYükle}"
@@ -195,15 +199,33 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Width="64" Height="64"
                                                     Source="{Binding Resim, Converter={StaticResource FilePathMergeConverter}}" />
-                                                <HeaderedContentControl Header="FİYAT">
-                                                    <hc:NumericUpDown DecimalPlaces="2" IsReadOnly="True" Minimum="0"
-                                                        ValueFormat="C"
-                                                        Value="{Binding Fiyat, UpdateSourceTrigger=PropertyChanged}" />
-                                                </HeaderedContentControl>
-                                                <HeaderedContentControl Header="ADET">
-                                                    <hc:NumericUpDown DecimalPlaces="0" IsReadOnly="True" Minimum="0"
-                                                        Value="{Binding Adet, UpdateSourceTrigger=PropertyChanged}" />
-                                                </HeaderedContentControl>
+                                                <hc:NumericUpDown hc:InfoElement.Title="FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                                    Minimum="1"
+                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                    ValueFormat="C"
+                                                    Value="{Binding Fiyat, UpdateSourceTrigger=PropertyChanged}" />
+                                                <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                                    IsReadOnly="True" Minimum="0"
+                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                    Value="{Binding Adet, UpdateSourceTrigger=PropertyChanged}" />
+                                                <StackPanel>
+                                                    <hc:SplitButton Content="İLAVE ÜRÜN">
+                                                        <hc:SplitButton.DropDownContent>
+                                                            <StackPanel>
+                                                                <hc:NumericUpDown DecimalPlaces="0" Minimum="1"
+                                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                                    Value="{Binding İlaveÜrünAdeti}" />
+                                                                <MenuItem Command="{Binding İlaveÜrünEkle}"
+                                                                    CommandParameter="{Binding Mode=OneWay}"
+                                                                    Header="İLAVE ÜRÜN EKLE" />
+                                                            </StackPanel>
+                                                        </hc:SplitButton.DropDownContent>
+                                                    </hc:SplitButton>
+                                                    <Button HorizontalAlignment="Stretch"
+                                                        Command="{Binding DataContext.DatabaseSave, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Content="GÜNCELLE"
+                                                        Style="{hc:StaticResource ButtonWarning}" />
+                                                </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
@@ -222,12 +244,12 @@
                     <hc:TransitioningContentControl TransitionMode="Right2LeftWithFade">
                         <GroupBox Header="MASA GİRİŞİ">
                             <hc:SimpleStackPanel>
-                                <HeaderedContentControl Header="MASA EN ADETİ">
-                                    <hc:NumericUpDown Minimum="1" Value="{Binding En}" />
-                                </HeaderedContentControl>
-                                <HeaderedContentControl Header="MASA BOY ADETİ">
-                                    <hc:NumericUpDown Minimum="1" Value="{Binding Boy}" />
-                                </HeaderedContentControl>
+                                <hc:NumericUpDown hc:InfoElement.Title="MASA EN ADETİ" hc:InfoElement.TitlePlacement="Top" Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    Value="{Binding En}" />
+                                <hc:NumericUpDown hc:InfoElement.Title="MASA BOY ADETİ" hc:InfoElement.TitlePlacement="Top" Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    Value="{Binding Boy}" />
                                 <HeaderedContentControl Header="GİZLENEN MASALAR">
                                     <ListBox Height="128"
                                         d:ItemsSource="{d:SampleData ItemCount=5}"

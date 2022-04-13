@@ -18,14 +18,6 @@
             <hc:Boolean2BooleanReConverter x:Key="Boolean2BooleanReConverter" />
             <Converter:FilePathMergeConverter x:Key="FilePathMergeConverter" />
             <Converter:SiparişSumConverter x:Key="SiparişSumConverter" />
-            <Storyboard x:Key="StoryboardRotate" x:Shared="False" Timeline.DesiredFrameRate="30">
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
-                    <EasingDoubleKeyFrame KeyTime="0" Value="0" />
-                    <EasingDoubleKeyFrame KeyTime="0:0:0.10" Value="-20" />
-                    <EasingDoubleKeyFrame KeyTime="0:0:0.30" Value="20" />
-                    <EasingDoubleKeyFrame KeyTime="0:0:0.40" Value="0" />
-                </DoubleAnimationUsingKeyFrames>
-            </Storyboard>
             <DrawingBrush x:Key="Koltuk" Stretch="Uniform">
                 <DrawingBrush.Drawing>
                     <DrawingGroup>
@@ -72,6 +64,7 @@
             </Style>
             <DataTemplate x:Key="MasaÖnizleme">
                 <ItemsControl Grid.Row="1" Margin="0,3,0,0"
+                    d:ItemsSource="{d:SampleData ItemCount=5}"
                     ItemsSource="{Binding ÖnizlemeMasa}"
                     Style="{DynamicResource VirtualizingStackPanelItemsControl}">
                     <ItemsControl.ItemTemplate>
@@ -109,15 +102,16 @@
             </DataTemplate>
             <DataTemplate x:Key="MasaDüzen">
                 <ListBox Grid.Row="1"
+                    d:ItemsSource="{d:SampleData ItemCount=5}"
                     ItemsSource="{Binding Veriler.Masalar.Masa}"
                     SelectedItem="{Binding SeçiliMasa}"
                     SelectionMode="Single">
                     <ListBox.Resources>
-                        <hc:Boolean2VisibilityReConverter x:Key="Boolean2VisibilityReConverter" />
+                        <Converter:BooltoVisibilityConverter x:Key="BooltoVisibilityConverter" />
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
-                            <Setter Property="Visibility" Value="{Binding Gizli, Converter={StaticResource Boolean2VisibilityReConverter}}" />
+                            <Setter Property="Visibility" Value="{Binding Gizli, Converter={StaticResource BooltoVisibilityConverter}, ConverterParameter='reverse'}" />
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>

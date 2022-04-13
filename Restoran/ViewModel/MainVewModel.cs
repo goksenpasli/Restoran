@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -15,6 +16,8 @@ namespace Restoran.ViewModel
     public class MainVewModel : INotifyPropertyChanged
     {
         public static readonly string xmldatapath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + @"\Data.xml";
+
+        private const int depoeşik = 20;
 
         public MainVewModel()
         {
@@ -70,6 +73,11 @@ namespace Restoran.ViewModel
                     Siparişler.Id = ExtensionMethods.RandomNumber();
                     Siparişler.Sipariş.Add(sipariş);
                     ürün.SiparişAdet = 1;
+
+                    if (DepoÜrünAdeti(ürün.Id) is >= 0 and < depoeşik)
+                    {
+                        Growl.Warning($"Dikkat Depoda Bu Üründen {depoeşik} Adetten Az Ürün Kaldı.");
+                    }
                 }
             }, parameter => SeçiliMasa is not null);
 
@@ -95,33 +103,29 @@ namespace Restoran.ViewModel
 
             MasaEkSiparişKaydet = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "İlave Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                if (parameter is Siparişler siparişler && HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "İlave Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    if (parameter is Siparişler siparişler)
+                    foreach (Sipariş item in Siparişler.Sipariş)
                     {
-                        foreach (Sipariş item in Siparişler.Sipariş)
-                        {
-                            siparişler.Sipariş.Add(item);
-                        }
-                        DatabaseSave.Execute(null);
-                        Siparişler = new();
-                        Growl.Success("İlave Sipariş Kaydedildi.");
+                        siparişler.Sipariş.Add(item);
                     }
+                    DatabaseSave.Execute(null);
+                    Siparişler = new();
+                    Growl.Success("İlave Sipariş Kaydedildi.");
                 }
             }, parameter => SeçiliMasa?.Dolu == true && Siparişler?.Sipariş?.Any() == true);
 
             SiparişTahsilEt = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Siparişler siparişler)
                 {
-                    if (parameter is Siparişler siparişler)
-                    {
-                        siparişler.Ödendi = true;
-                        siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
-                        SeçiliMasa.Dolu = false;
-                        DatabaseSave.Execute(null);
-                        Growl.Success("Tahsil Edildi.");
-                    }
+                    siparişler.Ödendi = true;
+                    siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
+                    SeçiliMasa.Dolu = false;
+                    ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
+
+                    DatabaseSave.Execute(null);
+                    Growl.Success("Tahsil Edildi.");
                 }
             }, parameter => parameter is Siparişler sipariş && sipariş?.Ödendi == false);
 
@@ -178,9 +182,9 @@ namespace Restoran.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int Boy { get; set; } = 1;
+        public static RelayCommand<object> DatabaseSave { get; set; }
 
-        public RelayCommand<object> DatabaseSave { get; }
+        public int Boy { get; set; } = 1;
 
         public int En { get; set; } = 1;
 
@@ -214,11 +218,30 @@ namespace Restoran.ViewModel
 
         public RelayCommand<object> WebAdreseGit { get; }
 
+        private double DepoÜrünAdeti(int ürünid)
+        {
+            return Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet;
+        }
+
         private void MainVewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName is "En" or "Boy")
             {
                 MasaOluştur.Execute(null);
+            }
+        }
+
+        private void ÜrünAdetDüşümüYap(ObservableCollection<Sipariş> Siparişler, ObservableCollection<Ürün> Ürünler)
+        {
+            foreach (Ürün ürün in Ürünler)
+            {
+                foreach (Sipariş sipariş in Siparişler.Where(sipariş => ürün.Id == sipariş.ÜrünId))
+                {
+                    if (sipariş.Adet <= ürün.Adet)
+                    {
+                        ürün.Adet -= sipariş.Adet;
+                    }
+                }
             }
         }
     }
