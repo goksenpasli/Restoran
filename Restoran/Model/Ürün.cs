@@ -14,7 +14,7 @@ namespace Restoran.Model
                 if (parameter is Ürün ürün)
                 {
                     ürün.Adet += ürün.İlaveÜrünAdeti;
-                    MainVewModel.DatabaseSave.Execute(null);
+                    MainViewModel.DatabaseSave.Execute(null);
                     ürün.İlaveÜrünAdeti = 1;
                 }
             }, parameter => true);

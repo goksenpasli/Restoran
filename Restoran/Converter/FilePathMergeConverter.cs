@@ -13,8 +13,8 @@ namespace Restoran.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !DesignerProperties.GetIsInDesignMode(new DependencyObject()) && value is string filename && !string.IsNullOrEmpty(filename) && File.Exists($"{Path.GetDirectoryName(MainVewModel.xmldatapath)}\\{filename}")
-                ? $"{Path.GetDirectoryName(MainVewModel.xmldatapath)}\\{filename}"
+            return !DesignerProperties.GetIsInDesignMode(new DependencyObject()) && value is string filename && !string.IsNullOrEmpty(filename) && File.Exists($"{Path.GetDirectoryName(MainViewModel.xmldatapath)}\\{filename}")
+                ? $"{Path.GetDirectoryName(MainViewModel.xmldatapath)}\\{filename}"
                 : null;
         }
 

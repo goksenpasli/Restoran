@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
@@ -13,13 +14,18 @@ using Restoran.Model;
 
 namespace Restoran.ViewModel
 {
-    public class MainVewModel : INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged
     {
         public static readonly string xmldatapath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + @"\Data.xml";
 
         private const int depoeşik = 20;
 
-        public MainVewModel()
+        static MainViewModel()
+        {
+            Yıllar = Enumerable.Range(DateTime.Now.Year - 5, 10);
+        }
+
+        public MainViewModel()
         {
             if (!File.Exists(xmldatapath))
             {
@@ -177,12 +183,14 @@ namespace Restoran.ViewModel
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
-            PropertyChanged += MainVewModel_PropertyChanged;
+            PropertyChanged += MainViewModel_PropertyChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static RelayCommand<object> DatabaseSave { get; set; }
+
+        public static IEnumerable<int> Yıllar { get; set; }
 
         public int Boy { get; set; } = 1;
 
@@ -204,6 +212,8 @@ namespace Restoran.ViewModel
 
         public Masa SeçiliMasa { get; set; }
 
+        public int SeçiliYıl { get; set; }
+
         public Siparişler Siparişler { get; set; }
 
         public RelayCommand<object> SiparişTahsilEt { get; }
@@ -218,17 +228,29 @@ namespace Restoran.ViewModel
 
         public RelayCommand<object> WebAdreseGit { get; }
 
+        public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
+
         private double DepoÜrünAdeti(int ürünid)
         {
             return Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet;
         }
 
-        private void MainVewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName is "En" or "Boy")
             {
                 MasaOluştur.Execute(null);
             }
+
+            if (e.PropertyName is "SeçiliYıl")
+            {
+                YıllarSiparişDurumu = SiparişDurumuVerileriniAl(SeçiliYıl);
+            }
+        }
+
+        private IEnumerable<Siparişler> SiparişDurumuVerileriniAl(int year)
+        {
+            return Veriler.Masalar.Masa.SelectMany(z => z.Siparişler).Where(z => z.Tarih.Year == year).GroupBy(z => z.Tarih.Month).OrderBy(z => z.Key).Select(t => new Siparişler() { Id = t.Key, ToplamTutar = t.Sum(z => z.ToplamTutar) });
         }
 
         private void ÜrünAdetDüşümüYap(ObservableCollection<Sipariş> Siparişler, ObservableCollection<Ürün> Ürünler)

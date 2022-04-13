@@ -6,7 +6,7 @@
     xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:local="clr-namespace:Restoran"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:Restoran.ViewModel" Title="Restoran"
-    d:DataContext="{d:DesignInstance Type={x:Type viewmodel:MainVewModel}}"
+    d:DataContext="{d:DesignInstance Type={x:Type viewmodel:MainViewModel}}"
     d:Height="450" d:Width="1024" hc:WindowAttach.IsDragElement="True"
     ShowTitle="False" UseLayoutRounding="True" WindowStartupLocation="CenterScreen"
     WindowState="Maximized" mc:Ignorable="d">
@@ -271,6 +271,25 @@
                     <ContentControl Grid.Column="1" hc:Growl.GrowlParent="True"
                         Content="{Binding}"
                         ContentTemplate="{DynamicResource MasaÖnizleme}" />
+                </Grid>
+            </hc:TabItem>
+            <hc:TabItem Header="YILLIK TAHSİLAT DURUM">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <hc:ComboBox hc:InfoElement.Placeholder="YILI SEÇİN"
+                        ItemsSource="{Binding Yıllar}"
+                        SelectedItem="{Binding SeçiliYıl}" />
+                    <DataGrid Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
+                        CanUserDeleteRows="False" IsReadOnly="True"
+                        ItemsSource="{Binding YıllarSiparişDurumu}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Id}" Header="AY" />
+                            <DataGridTextColumn Binding="{Binding ToplamTutar, StringFormat=\{0:C\}}" Header="TOPLAM TUTAR" />
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </hc:TabItem>
         </hc:TabControl>

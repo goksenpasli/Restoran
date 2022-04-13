@@ -10,7 +10,7 @@ namespace Restoran
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainVewModel();
+            DataContext = new MainViewModel();
         }
     }
 }
