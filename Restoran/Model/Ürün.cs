@@ -47,5 +47,8 @@ namespace Restoran.Model
 
         [XmlIgnore]
         public int SiparişAdet { get; set; } = 1;
+
+        [XmlAttribute(AttributeName = "UyarıAdet")]
+        public int UyarıAdet { get; set; } = 50;
     }
 }

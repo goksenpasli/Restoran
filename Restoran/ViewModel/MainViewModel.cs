@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using HandyControl.Controls;
 using HandyControl.Data;
 using Microsoft.Win32;
@@ -17,8 +17,6 @@ namespace Restoran.ViewModel
     public class MainViewModel : INotifyPropertyChanged
     {
         public static readonly string xmldatapath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + @"\Data.xml";
-
-        private const int depoeşik = 20;
 
         static MainViewModel()
         {
@@ -38,10 +36,7 @@ namespace Restoran.ViewModel
                 Ürünler = ExtensionMethods.Ürünler()
             };
 
-            Veriler.Ürünler.Ürün = ExtensionMethods.ÜrünleriYükle();
-            Veriler.Masalar.Masa = ExtensionMethods.MasalarıYükle();
-
-            Ürün = new Ürün();
+            VerileriYükle();
 
             DatabaseSave = new RelayCommand<object>(parameter =>
             {
@@ -79,10 +74,11 @@ namespace Restoran.ViewModel
                     Siparişler.Id = ExtensionMethods.RandomNumber();
                     Siparişler.Sipariş.Add(sipariş);
                     ürün.SiparişAdet = 1;
-
-                    if (DepoÜrünAdeti(ürün.Id) is >= 0 and < depoeşik)
+                    double adet = Veriler.DepoÜrünAdeti(ürün.Id);
+                    double eşik = Veriler.DepoÜrünEşikAdeti(ürün.Id);
+                    if (adet < eşik)
                     {
-                        Growl.Warning($"Dikkat Depoda Bu Üründen {depoeşik} Adetten Az Ürün Kaldı.");
+                        Growl.Warning($"Dikkat Depoda Bu Üründen {eşik} Adetten Az Ürün Kaldı.");
                     }
                 }
             }, parameter => SeçiliMasa is not null);
@@ -128,7 +124,7 @@ namespace Restoran.ViewModel
                     siparişler.Ödendi = true;
                     siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
                     SeçiliMasa.Dolu = false;
-                    ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
+                    ExtensionMethods.ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
 
                     DatabaseSave.Execute(null);
                     Growl.Success("Tahsil Edildi.");
@@ -151,6 +147,7 @@ namespace Restoran.ViewModel
                 }
             }, parameter => ÖnizlemeMasa?.Count(z => !z.Gizli) > 0 && Veriler?.Masalar?.Masa.Count <= 0);
 
+            Ürün = new Ürün();
             ÜrünKaydet = new RelayCommand<object>(parameter =>
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Ürün Kaydedilsin mi?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
@@ -162,7 +159,8 @@ namespace Restoran.ViewModel
                         Adet = Ürün.Adet,
                         Mevcut = true,
                         Id = ExtensionMethods.RandomNumber(),
-                        Resim = Ürün.Resim
+                        Resim = Ürün.Resim,
+                        UyarıAdet = Ürün.UyarıAdet
                     };
 
                     Veriler.Ürünler.Ürün.Add(ürün);
@@ -188,7 +186,7 @@ namespace Restoran.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static RelayCommand<object> DatabaseSave { get; set; }
+        public static ICommand DatabaseSave { get; set; }
 
         public static IEnumerable<int> Yıllar { get; set; }
 
@@ -196,44 +194,45 @@ namespace Restoran.ViewModel
 
         public int En { get; set; } = 1;
 
-        public RelayCommand<object> MasaEkSiparişKaydet { get; }
+        public ICommand MasaEkSiparişKaydet { get; }
 
-        public RelayCommand<object> MasaKaydet { get; }
+        public ICommand MasaKaydet { get; }
 
-        public RelayCommand<object> MasaOluştur { get; }
+        public ICommand MasaOluştur { get; }
 
-        public RelayCommand<object> MasaSiparişEkle { get; }
+        public ICommand MasaSiparişEkle { get; }
 
-        public RelayCommand<object> MasaSiparişKaydet { get; }
+        public ICommand MasaSiparişKaydet { get; }
 
-        public RelayCommand<object> MasaSiparişSil { get; }
+        public ICommand MasaSiparişSil { get; }
+
+        public bool MasaTabSelected { get; set; } = true;
 
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
 
         public Masa SeçiliMasa { get; set; }
 
-        public int SeçiliYıl { get; set; }
+        public int SeçiliYıl { get; set; } = DateTime.Now.Year;
 
         public Siparişler Siparişler { get; set; }
 
-        public RelayCommand<object> SiparişTahsilEt { get; }
+        public ICommand SiparişTahsilEt { get; }
+
+        public bool TahsilatTabSelected { get; set; }
+
+        public bool TümKayıtlar { get; set; } = true;
 
         public Ürün Ürün { get; set; }
 
-        public RelayCommand<object> ÜrünKaydet { get; }
+        public ICommand ÜrünKaydet { get; }
 
-        public RelayCommand<object> ÜrünResimYükle { get; }
+        public ICommand ÜrünResimYükle { get; }
 
         public Veriler Veriler { get; set; }
 
-        public RelayCommand<object> WebAdreseGit { get; }
+        public ICommand WebAdreseGit { get; }
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
-
-        private double DepoÜrünAdeti(int ürünid)
-        {
-            return Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet;
-        }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -241,30 +240,29 @@ namespace Restoran.ViewModel
             {
                 MasaOluştur.Execute(null);
             }
-
-            if (e.PropertyName is "SeçiliYıl")
+            if (e.PropertyName is "SeçiliYıl" || (e.PropertyName is "TahsilatTabSelected" && TahsilatTabSelected))
             {
-                YıllarSiparişDurumu = SiparişDurumuVerileriniAl(SeçiliYıl);
+                YıllarSiparişDurumu = Veriler.SiparişDurumuVerileriniAl(SeçiliYıl);
             }
-        }
-
-        private IEnumerable<Siparişler> SiparişDurumuVerileriniAl(int year)
-        {
-            return Veriler.Masalar.Masa.SelectMany(z => z.Siparişler).Where(z => z.Tarih.Year == year).GroupBy(z => z.Tarih.Month).OrderBy(z => z.Key).Select(t => new Siparişler() { Id = t.Key, ToplamTutar = t.Sum(z => z.ToplamTutar) });
-        }
-
-        private void ÜrünAdetDüşümüYap(ObservableCollection<Sipariş> Siparişler, ObservableCollection<Ürün> Ürünler)
-        {
-            foreach (Ürün ürün in Ürünler)
+            if (e.PropertyName is "MasaTabSelected" && MasaTabSelected)
             {
-                foreach (Sipariş sipariş in Siparişler.Where(sipariş => ürün.Id == sipariş.ÜrünId))
+                VerileriYükle();
+            }
+            if (e.PropertyName is "TümKayıtlar")
+            {
+                if (TümKayıtlar)
                 {
-                    if (sipariş.Adet <= ürün.Adet)
-                    {
-                        ürün.Adet -= sipariş.Adet;
-                    }
+                    MainWindow.cvs.Filter += (s, e) => e.Accepted = true;
+                    return;
                 }
+                MainWindow.cvs.Filter += (s, e) => e.Accepted = (e.Item as Siparişler)?.Tarih > DateTime.Today;
             }
+        }
+
+        private void VerileriYükle()
+        {
+            Veriler.Ürünler.Ürün = ExtensionMethods.ÜrünleriYükle();
+            Veriler.Masalar.Masa = ExtensionMethods.MasalarıYükle();
         }
     }
 }

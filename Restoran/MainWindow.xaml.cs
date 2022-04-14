@@ -1,5 +1,6 @@
-﻿using System.Windows;
+﻿using System.Windows.Data;
 using Restoran.ViewModel;
+
 namespace Restoran
 {
     /// <summary>
@@ -7,10 +8,13 @@ namespace Restoran
     /// </summary>
     public partial class MainWindow : HandyControl.Controls.Window
     {
+        public static CollectionViewSource cvs;
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainViewModel();
+            cvs = TryFindResource("Siparişler") as CollectionViewSource;
         }
     }
 }

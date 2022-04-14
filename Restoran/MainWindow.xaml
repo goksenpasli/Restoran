@@ -29,7 +29,8 @@
     </hc:Window.Resources>
     <Grid>
         <hc:TabControl ShowContextMenu="False" Style="{hc:StaticResource TabControlCapsuleSolid}">
-            <hc:TabItem Header="MASA">
+            <hc:TabItem d:IsSelected="true" Header="MASA"
+                IsSelected="{Binding MasaTabSelected}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -42,48 +43,52 @@
                     <hc:TransitioningContentControl Grid.RowSpan="2" Margin="2" TransitionMode="Bottom2TopWithFade">
                         <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
                     </hc:TransitioningContentControl>
-                    <ListBox Grid.RowSpan="2" Grid.Column="1" Margin="2"
-                        d:ItemsSource="{d:SampleData ItemCount=5}"
-                        IsSynchronizedWithCurrentItem="False"
-                        ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel IsEnabled="{Binding IsEnabled, ElementName=BtnTahsil}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <StackPanel.ToolTip>
-                                            <StackPanel Orientation="Horizontal">
-                                                <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
-                                                    ItemTemplate="{DynamicResource SiparişItemTemplate}"
-                                                    ItemsSource="{Binding Sipariş}" />
-                                                <TextBlock VerticalAlignment="Center" FontSize="24" FontWeight="Bold"
-                                                    Foreground="Red" Language="tr-tr"
-                                                    Text="{Binding Sipariş, Converter={StaticResource SiparişSumConverter}, StringFormat=\{0:C\}}" />
-                                            </StackPanel>
-                                        </StackPanel.ToolTip>
-                                        <TextBlock VerticalAlignment="Center" Language="tr-tr"
-                                            Text="{Binding Tarih, StringFormat=\{0:g\}}" />
-                                        <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
-                                            <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
-                                                IsReadOnly="True"
-                                                Style="{hc:StaticResource NumericUpDownExtend}"
-                                                ValueFormat="C"
-                                                Value="{Binding ToplamTutar}" />
-                                        </CheckBox>
-                                        <Button x:Name="BtnTahsil"
-                                            Command="{Binding DataContext.SiparişTahsilEt, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                    <GroupBox Grid.RowSpan="2" Grid.Column="1" Margin="2">
+                        <GroupBox.Header>
+                            <CheckBox Content="TÜM KAYITLAR" IsChecked="{Binding TümKayıtlar}" />
+                        </GroupBox.Header>
+                        <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
+                            IsSynchronizedWithCurrentItem="False"
+                            ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel IsEnabled="{Binding IsEnabled, ElementName=BtnTahsil}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel.ToolTip>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
+                                                        ItemTemplate="{DynamicResource SiparişItemTemplate}"
+                                                        ItemsSource="{Binding Sipariş}" />
+                                                    <TextBlock VerticalAlignment="Center" FontSize="24" FontWeight="Bold"
+                                                        Foreground="Red" Language="tr-tr"
+                                                        Text="{Binding Sipariş, Converter={StaticResource SiparişSumConverter}, StringFormat=\{0:C\}}" />
+                                                </StackPanel>
+                                            </StackPanel.ToolTip>
+                                            <TextBlock VerticalAlignment="Center" Language="tr-tr"
+                                                Text="{Binding Tarih, StringFormat=\{0:g\}}" />
+                                            <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
+                                                <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
+                                                    IsReadOnly="True"
+                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                    ValueFormat="C"
+                                                    Value="{Binding ToplamTutar}" />
+                                            </CheckBox>
+                                            <Button x:Name="BtnTahsil"
+                                                Command="{Binding DataContext.SiparişTahsilEt, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                CommandParameter="{Binding Mode=OneWay}"
+                                                Content="TAHSİL ET"
+                                                Style="{hc:StaticResource ButtonSuccess}" />
+                                        </StackPanel>
+                                        <Button Grid.Row="2" HorizontalAlignment="Stretch"
+                                            Command="{Binding DataContext.MasaEkSiparişKaydet, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding Mode=OneWay}"
-                                            Content="TAHSİL ET"
-                                            Style="{hc:StaticResource ButtonSuccess}" />
+                                            Content="İLAVE SİPARİŞ EKLE"
+                                            Style="{hc:StaticResource ButtonWarning}" />
                                     </StackPanel>
-                                    <Button Grid.Row="2" HorizontalAlignment="Stretch"
-                                        Command="{Binding DataContext.MasaEkSiparişKaydet, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding Mode=OneWay}"
-                                        Content="İLAVE SİPARİŞ EKLE"
-                                        Style="{hc:StaticResource ButtonWarning}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </GroupBox>
                     <hc:TransitioningContentControl Grid.Column="2" Margin="2" TransitionMode="Right2LeftWithFade">
                         <GroupBox Header="ÜRÜNLER">
                             <Grid>
@@ -170,6 +175,11 @@
                                     Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     Value="{Binding Ürün.Adet, UpdateSourceTrigger=PropertyChanged}" />
+                                <hc:NumericUpDown hc:InfoElement.Title="UYARI ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                    Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    ToolTip="Bu Adetten Aşağı Ürün Kalırsa Uyarı Ver"
+                                    Value="{Binding Ürün.UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
                                 <HeaderedContentControl Header="ÜRÜN RESİM">
                                     <Button HorizontalAlignment="Stretch"
                                         Command="{Binding ÜrünResimYükle}"
@@ -226,6 +236,10 @@
                                                         Content="GÜNCELLE"
                                                         Style="{hc:StaticResource ButtonWarning}" />
                                                 </StackPanel>
+                                                <hc:NumericUpDown hc:InfoElement.Title="UYARI ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                                    Minimum="0"
+                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                    Value="{Binding UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
@@ -273,7 +287,7 @@
                         ContentTemplate="{DynamicResource MasaÖnizleme}" />
                 </Grid>
             </hc:TabItem>
-            <hc:TabItem Header="YILLIK TAHSİLAT DURUM">
+            <hc:TabItem Header="YILLIK TAHSİLAT DURUM" IsSelected="{Binding TahsilatTabSelected}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

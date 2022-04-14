@@ -28,6 +28,16 @@ namespace Restoran
             Png = 3
         }
 
+        public static double DepoÜrünAdeti(this Veriler veriler, int ürünid)
+        {
+            return veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet;
+        }
+
+        public static double DepoÜrünEşikAdeti(this Veriler veriler, int ürünid)
+        {
+            return veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).UyarıAdet;
+        }
+
         public static string ResimYükle(this string file, double en, double boy)
         {
             string filename = Guid.NewGuid() + Path.GetExtension(file);
@@ -61,6 +71,11 @@ namespace Restoran
         [DllImport("shell32.dll", SetLastError = true)]
         public static extern void SHParseDisplayName([MarshalAs(UnmanagedType.LPWStr)] string name, IntPtr bindingContext, [Out] out IntPtr pidl, uint sfgaoIn, [Out] out uint psfgaoOut);
 
+        public static IEnumerable<Siparişler> SiparişDurumuVerileriniAl(this Veriler veriler, int year)
+        {
+            return veriler.Masalar.Masa.SelectMany(z => z.Siparişler).Where(z => z.Tarih.Year == year).GroupBy(z => z.Tarih.Month).OrderBy(z => z.Key).Select(t => new Siparişler() { Id = t.Key, ToplamTutar = t.Sum(z => z.ToplamTutar) });
+        }
+
         public static byte[] ToTiffJpegByteArray(this ImageSource bitmapsource, Format format)
         {
             using MemoryStream outStream = new();
@@ -92,6 +107,20 @@ namespace Restoran
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format), format, null);
+            }
+        }
+
+        public static void ÜrünAdetDüşümüYap(ObservableCollection<Sipariş> Siparişler, ObservableCollection<Ürün> Ürünler)
+        {
+            foreach (Ürün ürün in Ürünler)
+            {
+                foreach (Sipariş sipariş in Siparişler.Where(sipariş => ürün.Id == sipariş.ÜrünId))
+                {
+                    if (sipariş.Adet <= ürün.Adet)
+                    {
+                        ürün.Adet -= sipariş.Adet;
+                    }
+                }
             }
         }
 
