@@ -76,7 +76,7 @@ namespace Restoran
 
         public static IEnumerable<Siparişler> SiparişDurumuVerileriniAl(this Veriler veriler, int year)
         {
-            return veriler.Masalar.Masa.SelectMany(z => z.Siparişler).Where(z => z.Tarih.Year == year).GroupBy(z => z.Tarih.Month).OrderBy(z => z.Key).Select(t => new Siparişler() { Id = t.Key, ToplamTutar = t.Sum(z => z.ToplamTutar) });
+            return veriler.Salonlar.Masalar.SelectMany(z => z.Masa).SelectMany(z => z.Siparişler).Where(z => z.Tarih.Year == year).GroupBy(z => z.Tarih.Month).OrderBy(z => z.Key).Select(t => new Siparişler() { Id = t.Key, ToplamTutar = t.Sum(z => z.ToplamTutar) });
         }
 
         public static byte[] ToTiffJpegByteArray(this ImageSource bitmapsource, Format format)
@@ -151,7 +151,7 @@ namespace Restoran
             }
             catch (Exception Ex)
             {
-                MessageBox.Show(Ex.Message);
+                _ = MessageBox.Show(Ex.Message);
                 return null;
             }
         }
@@ -172,22 +172,13 @@ namespace Restoran
             return list;
         }
 
-        internal static Masalar Masalar()
+        internal static ObservableCollection<Masalar> MasalarıYükle()
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
            ? null
            : File.Exists(MainViewModel.xmldatapath)
-           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Masalar
-           : new Masalar();
-        }
-
-        internal static ObservableCollection<Masa> MasalarıYükle()
-        {
-            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
-           ? null
-           : File.Exists(MainViewModel.xmldatapath)
-           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Masalar.Masa
-           : new ObservableCollection<Masa>();
+           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Salonlar.Masalar
+           : new ObservableCollection<Masalar>();
         }
 
         internal static string RandomColor()
@@ -198,6 +189,15 @@ namespace Restoran
         internal static int RandomNumber()
         {
             return new Random(Guid.NewGuid().GetHashCode()).Next(1, int.MaxValue);
+        }
+
+        internal static Salonlar Salonlar()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                    ? null
+                    : File.Exists(MainViewModel.xmldatapath)
+                    ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Salonlar
+                    : new Salonlar();
         }
 
         internal static void Serialize<T>(this T dataToSerialize) where T : class

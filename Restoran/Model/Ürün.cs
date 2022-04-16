@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
 using System.Xml.Serialization;
 using DotLiquid;
+using HandyControl.Controls;
 using Restoran.ViewModel;
 
 namespace Restoran.Model
@@ -19,6 +22,7 @@ namespace Restoran.Model
                     ürün.İlaveÜrünAdeti = 1;
                 }
             }, parameter => true);
+            PropertyChanged += Ürün_PropertyChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -29,6 +33,9 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "Adet")]
         public int Adet { get; set; }
 
+        [XmlAttribute(AttributeName = "Favori")]
+        public bool Favori { get; set; }
+
         [XmlAttribute(AttributeName = "Fiyat")]
         public double Fiyat { get; set; } = 1;
 
@@ -38,7 +45,7 @@ namespace Restoran.Model
         [XmlIgnore]
         public int İlaveÜrünAdeti { get; set; } = 1;
 
-        public RelayCommand<object> İlaveÜrünEkle { get; }
+        public ICommand İlaveÜrünEkle { get; }
 
         [XmlAttribute(AttributeName = "Mevcut")]
         public bool Mevcut { get; set; }
@@ -54,7 +61,18 @@ namespace Restoran.Model
 
         public object ToLiquid()
         {
-            return new { Adet, Açıklama,Fiyat,Id };
+            return new { Adet, Açıklama, Fiyat, Id };
+        }
+
+        private void Ürün_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is "SiparişAdet")
+            {
+                if (SiparişAdet > ExtensionMethods.ÜrünleriYükle().FirstOrDefault(z => z.Id == Id).Adet)
+                {
+                    Growl.Warning("Dikkat Depoda Bu Kadar Ürün Yok.");
+                }
+            }
         }
     }
 }

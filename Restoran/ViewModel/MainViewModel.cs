@@ -32,12 +32,12 @@ namespace Restoran.ViewModel
         {
             if (!File.Exists(xmldatapath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(xmldatapath));
+                _ = Directory.CreateDirectory(Path.GetDirectoryName(xmldatapath));
             }
 
             Veriler = new Veriler
             {
-                Masalar = ExtensionMethods.Masalar(),
+                Salonlar = ExtensionMethods.Salonlar(),
                 Ürünler = ExtensionMethods.Ürünler()
             };
 
@@ -51,7 +51,7 @@ namespace Restoran.ViewModel
                 }
                 catch (Exception Ex)
                 {
-                    HandyControl.Controls.MessageBox.Show(Ex.Message);
+                    _ = HandyControl.Controls.MessageBox.Show(Ex.Message);
                 }
             }, parameter => File.Exists(xmldatapath));
 
@@ -86,27 +86,27 @@ namespace Restoran.ViewModel
                         Growl.Warning($"Dikkat Depoda Bu Üründen {eşik} Adetten Az Ürün Kaldı.");
                     }
                 }
-            }, parameter => SeçiliMasa is not null);
+            }, parameter => Masalar?.SeçiliMasa is not null);
 
             MasaSiparişSil = new RelayCommand<object>(parameter =>
             {
                 if (parameter is Sipariş sipariş)
                 {
-                    Siparişler.Sipariş.Remove(sipariş);
+                    _ = Siparişler.Sipariş.Remove(sipariş);
                 }
-            }, parameter => SeçiliMasa is not null);
+            }, parameter => Masalar?.SeçiliMasa is not null);
 
             MasaSiparişKaydet = new RelayCommand<object>(parameter =>
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    SeçiliMasa.Siparişler.Add(Siparişler);
-                    SeçiliMasa.Dolu = true;
+                    Masalar?.SeçiliMasa?.Siparişler?.Add(Siparişler);
+                    Masalar.SeçiliMasa.Dolu = true;
                     DatabaseSave.Execute(null);
                     Siparişler = new();
                     Growl.Success("Sipariş Kaydedildi.");
                 }
-            }, parameter => SeçiliMasa?.Dolu == false && Siparişler?.Sipariş?.Any() == true);
+            }, parameter => Masalar?.SeçiliMasa?.Dolu == false && Siparişler?.Sipariş?.Any() == true);
 
             MasaEkSiparişKaydet = new RelayCommand<object>(parameter =>
             {
@@ -120,7 +120,7 @@ namespace Restoran.ViewModel
                     Siparişler = new();
                     Growl.Success("İlave Sipariş Kaydedildi.");
                 }
-            }, parameter => SeçiliMasa?.Dolu == true && Siparişler?.Sipariş?.Any() == true);
+            }, parameter => Masalar?.SeçiliMasa?.Dolu == true && Siparişler?.Sipariş?.Any() == true);
 
             SiparişTahsilEt = new RelayCommand<object>(parameter =>
             {
@@ -128,7 +128,7 @@ namespace Restoran.ViewModel
                 {
                     siparişler.Ödendi = true;
                     siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
-                    SeçiliMasa.Dolu = false;
+                    Masalar.SeçiliMasa.Dolu = false;
                     ExtensionMethods.ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
 
                     DatabaseSave.Execute(null);
@@ -140,17 +140,24 @@ namespace Restoran.ViewModel
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Düzen Kaydedilsin mi? Bu Düzen Daha Değiştirilmeyecektir.", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    Veriler.Masalar.En = En;
-                    Veriler.Masalar.Boy = Boy;
+                    Masalar masalar = new()
+                    {
+                        En = En,
+                        Boy = Boy,
+                        Id = ExtensionMethods.RandomNumber(),
+                        SalonAdı = SalonAdı
+                    };
                     foreach (Masa item in ÖnizlemeMasa)
                     {
-                        Veriler.Masalar.Masa.Add(item);
+                        masalar.Masa.Add(item);
                     }
+
+                    Veriler?.Salonlar?.Masalar?.Add(masalar);
                     DatabaseSave.Execute(null);
                     ÖnizlemeMasa.Clear();
                     Growl.Success("Masa Düzeni Oluşturuldu.");
                 }
-            }, parameter => ÖnizlemeMasa?.Count(z => !z.Gizli) > 0 && Veriler?.Masalar?.Masa.Count <= 0);
+            }, parameter => ÖnizlemeMasa?.Count(z => !z.Gizli) > 0 && !string.IsNullOrWhiteSpace(SalonAdı));
 
             Ürün = new Ürün();
             ÜrünKaydet = new RelayCommand<object>(parameter =>
@@ -165,10 +172,11 @@ namespace Restoran.ViewModel
                         Mevcut = true,
                         Id = ExtensionMethods.RandomNumber(),
                         Resim = Ürün.Resim,
-                        UyarıAdet = Ürün.UyarıAdet
+                        UyarıAdet = Ürün.UyarıAdet,
+                        Favori = Ürün.Favori
                     };
 
-                    Veriler.Ürünler.Ürün.Add(ürün);
+                    Veriler?.Ürünler?.Ürün?.Add(ürün);
                     DatabaseSave.Execute(null);
                     Ürün.Resim = null;
                     Growl.Success("Ürün Kaydedildi.");
@@ -188,20 +196,17 @@ namespace Restoran.ViewModel
             {
                 if (File.Exists("Report\\report.lqd"))
                 {
-                    using FileStream stream = new("Report\\report.lqd", FileMode.Open);
-                    using StreamReader reader = new(stream);
-                    dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
-                    Hash docContext = CreateDocumentContext(parameter as Siparişler);
-                    string docString = template.Render(docContext);
+                    string template = GenerateTemplate(parameter, "Report\\report.lqd");
                     FişView fiş = new();
-                    FlowDocument fd = (FlowDocument)XamlReader.Parse(docString);
+                    FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
                     fiş.DocViewer.Document = fd.WriteXPS();
-
-                    Dialog.Show(fiş);
+                    _ = Dialog.Show(fiş);
                 }
             }, parameter => true);
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
+
+            Masalar = Veriler.Salonlar.Masalar.FirstOrDefault();
 
             PropertyChanged += MainViewModel_PropertyChanged;
         }
@@ -222,6 +227,8 @@ namespace Restoran.ViewModel
 
         public ICommand MasaKaydet { get; }
 
+        public Masalar Masalar { get; set; }
+
         public ICommand MasaOluştur { get; }
 
         public ICommand MasaSiparişEkle { get; }
@@ -230,11 +237,11 @@ namespace Restoran.ViewModel
 
         public ICommand MasaSiparişSil { get; }
 
-        public bool MasaTabSelected { get; set; } = true;
-
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
 
-        public Masa SeçiliMasa { get; set; }
+        public string SalonAdı { get; set; }
+
+        public bool SalonTabSelected { get; set; } = true;
 
         public int SeçiliYıl { get; set; } = DateTime.Now.Year;
 
@@ -258,13 +265,23 @@ namespace Restoran.ViewModel
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
 
-        private Hash CreateDocumentContext(Siparişler siparişler)
+        private Hash CreateDocumentContext(object siparişler)
         {
             ObservableCollection<Ürün> ürünler = ExtensionMethods.ÜrünleriYükle();
             return Hash.FromAnonymousObject(new
             {
-                Siparişler = siparişler?.Sipariş.Select(sipariş => new Ürün() { Fiyat = ürünler.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = ürünler.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama })
+                Siparişler = (siparişler as Siparişler)?.Sipariş.Select(sipariş => new Ürün() { Fiyat = ürünler.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = ürünler.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
+                Toplam = (siparişler as Siparişler)?.Sipariş.SiparişToplamları()
             });
+        }
+
+        private string GenerateTemplate(object parameter, string reportpath)
+        {
+            using FileStream stream = new(reportpath, FileMode.Open);
+            using StreamReader reader = new(stream);
+            dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
+            Hash docContext = CreateDocumentContext(parameter as Siparişler);
+            return template.Render(docContext);
         }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -277,7 +294,7 @@ namespace Restoran.ViewModel
             {
                 YıllarSiparişDurumu = Veriler.SiparişDurumuVerileriniAl(SeçiliYıl);
             }
-            if (e.PropertyName is "MasaTabSelected" && MasaTabSelected)
+            if (e.PropertyName is "SalonTabSelected" && SalonTabSelected)
             {
                 VerileriYükle();
             }
@@ -295,7 +312,7 @@ namespace Restoran.ViewModel
         private void VerileriYükle()
         {
             Veriler.Ürünler.Ürün = ExtensionMethods.ÜrünleriYükle();
-            Veriler.Masalar.Masa = ExtensionMethods.MasalarıYükle();
+            Veriler.Salonlar.Masalar = ExtensionMethods.MasalarıYükle();
         }
     }
 }

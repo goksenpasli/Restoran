@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
-using DotLiquid;
 
 namespace Restoran.Model
 {
@@ -14,10 +13,5 @@ namespace Restoran.Model
 
         [XmlAttribute(AttributeName = "ÜrünId")]
         public int ÜrünId { get; set; }
-
-        //public object ToLiquid()
-        //{
-        //    return new { Adet, ÜrünId };
-        //}
     }
 }

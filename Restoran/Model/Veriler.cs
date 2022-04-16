@@ -8,8 +8,8 @@ namespace Restoran.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [XmlElement(ElementName = "Masalar")]
-        public Masalar Masalar { get; set; }
+        [XmlElement(ElementName = "Salonlar")]
+        public Salonlar Salonlar { get; set; }
 
         [XmlElement(ElementName = "Tahsilatlar")]
         public Tahsilatlar Tahsilatlar { get; set; }

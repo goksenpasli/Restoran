@@ -15,7 +15,16 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "En")]
         public int En { get; set; }
 
+        [XmlAttribute(AttributeName = "Id")]
+        public int Id { get; set; }
+
         [XmlElement(ElementName = "Masa")]
-        public ObservableCollection<Masa> Masa { get; set; }
+        public ObservableCollection<Masa> Masa { get; set; } = new();
+
+        [XmlAttribute(AttributeName = "SalonAdı")]
+        public string SalonAdı { get; set; }
+
+        [XmlIgnore]
+        public Masa SeçiliMasa { get; set; }
     }
 }

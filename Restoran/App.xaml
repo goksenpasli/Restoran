@@ -1,16 +1,17 @@
 ﻿<Application x:Class="Restoran.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Converter="clr-namespace:Restoran.Converter"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:hc="https://handyorg.github.io/handycontrol"
-    xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
-    xmlns:local="clr-namespace:Restoran"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" StartupUri="MainWindow.xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Restoran"
+             xmlns:Converter="clr-namespace:Restoran.Converter"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             StartupUri="MainWindow.xaml"
     mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <hc:ThemeResources UsingSystemTheme="True" />
+                <hc:ThemeResources UsingSystemTheme="False" />
                 <hc:Theme />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
@@ -103,7 +104,7 @@
             <DataTemplate x:Key="MasaDüzen">
                 <ListBox Grid.Row="1"
                     d:ItemsSource="{d:SampleData ItemCount=5}"
-                    ItemsSource="{Binding Veriler.Masalar.Masa}"
+                    ItemsSource="{Binding Masa}"
                     SelectedItem="{Binding SeçiliMasa}"
                     SelectionMode="Single">
                     <ListBox.Resources>
@@ -137,8 +138,9 @@
                                             Text="{Binding No}" />
                                         <Border Width="50" Height="50" HorizontalAlignment="Left"
                                             VerticalAlignment="Center"
+                                            d:Background="{StaticResource Koltuk}"
                                             Background="{StaticResource Koltuk}"
-                                            BorderBrush="{Binding Renk, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            BorderBrush="{Binding Renk}"
                                             BorderThickness="2" />
                                     </StackPanel>
                                 </Viewbox>
@@ -148,7 +150,7 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <local:VirtualizingTilePanel d:Columns="3"
-                                Columns="{Binding Veriler.Masalar.En}"
+                                Columns="{Binding En}"
                                 Tile="False" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>

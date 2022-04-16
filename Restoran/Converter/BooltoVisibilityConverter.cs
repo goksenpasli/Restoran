@@ -10,29 +10,11 @@ namespace Restoran.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            {
-                return Visibility.Visible;
-            }
-            if (parameter != null)
-            {
-                if ((bool)value)
-                {
-                    return Visibility.Collapsed;
-                }
-                else
-                {
-                    return Visibility.Visible;
-                }
-            }
-            else if (value != null && (bool)value)
-            {
-                return Visibility.Visible;
-            }
-            else
-            {
-                return Visibility.Collapsed;
-            }
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                ? Visibility.Visible
+                : (object)(parameter != null
+                ? (bool)value ? Visibility.Collapsed : Visibility.Visible
+                : value != null && (bool)value ? Visibility.Visible : Visibility.Collapsed);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

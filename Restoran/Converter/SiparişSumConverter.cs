@@ -12,15 +12,9 @@ namespace Restoran.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            {
-                return string.Empty;
-            }
-            if (value is ObservableCollection<Sipariş> Siparişler)
-            {
-                return Siparişler.SiparişToplamları();
-            }
-            return string.Empty;
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                ? string.Empty
+                : value is ObservableCollection<Sipariş> Siparişler ? Siparişler.SiparişToplamları() : (object)string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

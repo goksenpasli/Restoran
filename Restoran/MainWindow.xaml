@@ -21,16 +21,24 @@
         </StackPanel>
     </hc:Window.NonClientAreaContent>
     <hc:Window.Resources>
-        <CollectionViewSource x:Key="Siparişler" Source="{Binding SeçiliMasa.Siparişler}">
+        <CollectionViewSource x:Key="Siparişler" Source="{Binding Masalar.SeçiliMasa.Siparişler}">
             <CollectionViewSource.SortDescriptions>
                 <ComponentModel:SortDescription Direction="Descending" PropertyName="Tarih" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+        <CollectionViewSource x:Key="Ürünler" Source="{Binding Veriler.Ürünler.Ürün}">
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription Direction="Descending" PropertyName="Favori" />
+            </CollectionViewSource.SortDescriptions>
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Favori" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
     </hc:Window.Resources>
     <Grid>
         <hc:TabControl ShowContextMenu="False" Style="{hc:StaticResource TabControlCapsuleSolid}">
-            <hc:TabItem d:IsSelected="true" Header="MASA"
-                IsSelected="{Binding MasaTabSelected}">
+            <hc:TabItem d:IsSelected="true" Header="SALON"
+                IsSelected="{Binding SalonTabSelected}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -41,115 +49,148 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <hc:TransitioningContentControl Grid.RowSpan="2" Margin="2" TransitionMode="Bottom2TopWithFade">
-                        <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
+                        <hc:TabControl d:ItemsSource="{d:SampleData ItemCount=5}"
+                            ItemsSource="{Binding Veriler.Salonlar.Masalar}"
+                            SelectedItem="{Binding Masalar}"
+                            ShowContextMenu="False"
+                            Style="{hc:StaticResource TabControlCapsuleSolid}">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding SalonAdı}" />
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </hc:TabControl>
                     </hc:TransitioningContentControl>
                     <GroupBox Grid.RowSpan="2" Grid.Column="1" Margin="2">
                         <GroupBox.Header>
                             <CheckBox Content="TÜM KAYITLAR" IsChecked="{Binding TümKayıtlar}" />
                         </GroupBox.Header>
-                        <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
-                            IsSynchronizedWithCurrentItem="False"
-                            ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel IsEnabled="{Binding Ödendi, Converter={StaticResource Boolean2BooleanReConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
+                                IsSynchronizedWithCurrentItem="False"
+                                ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <StackPanel.ToolTip>
+                                            <StackPanel IsEnabled="{Binding Ödendi, Converter={StaticResource Boolean2BooleanReConverter}}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <ListBox ItemTemplate="{DynamicResource SiparişItemTemplate}" ItemsSource="{Binding Sipariş}" />
-                                                    <TextBlock VerticalAlignment="Center" FontSize="24" FontWeight="Bold"
-                                                        Foreground="Red"
-                                                        Text="{Binding Sipariş, Converter={StaticResource SiparişSumConverter}, StringFormat=\{0:C\}}" />
+                                                    <StackPanel.ToolTip>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ListBox ItemTemplate="{DynamicResource SiparişItemTemplate}" ItemsSource="{Binding Sipariş}" />
+                                                            <TextBlock VerticalAlignment="Center" FontSize="24" FontWeight="Bold"
+                                                                Foreground="Red"
+                                                                Text="{Binding Sipariş, Converter={StaticResource SiparişSumConverter}, StringFormat=\{0:C\}}" />
+                                                        </StackPanel>
+                                                    </StackPanel.ToolTip>
+                                                    <TextBlock VerticalAlignment="Center" Text="{Binding Tarih, StringFormat=\{0:g\}}" />
+                                                    <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
+                                                        <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
+                                                            IsReadOnly="True"
+                                                            Style="{hc:StaticResource NumericUpDownExtend}"
+                                                            ValueFormat="C"
+                                                            Value="{Binding ToplamTutar}" />
+                                                    </CheckBox>
+                                                    <Button Command="{Binding DataContext.SiparişTahsilEt, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                        CommandParameter="{Binding Mode=OneWay}"
+                                                        Content="TAHSİL ET"
+                                                        Style="{hc:StaticResource ButtonSuccess}" />
                                                 </StackPanel>
-                                            </StackPanel.ToolTip>
-                                            <TextBlock VerticalAlignment="Center" Text="{Binding Tarih, StringFormat=\{0:g\}}" />
-                                            <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
-                                                <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
-                                                    IsReadOnly="True"
-                                                    Style="{hc:StaticResource NumericUpDownExtend}"
-                                                    ValueFormat="C"
-                                                    Value="{Binding ToplamTutar}" />
-                                            </CheckBox>
-                                            <Button Command="{Binding DataContext.SiparişTahsilEt, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                                CommandParameter="{Binding Mode=OneWay}"
-                                                Content="TAHSİL ET"
-                                                Style="{hc:StaticResource ButtonSuccess}" />
-                                            <Button Command="{Binding DataContext.FişEkranı, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                <Button HorizontalAlignment="Stretch"
+                                                    Command="{Binding DataContext.MasaEkSiparişKaydet, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding Mode=OneWay}"
+                                                    Content="İLAVE SİPARİŞ EKLE"
+                                                    Style="{hc:StaticResource ButtonWarning}" />
+                                            </StackPanel>
+                                            <Button Height="65"
+                                                Command="{Binding DataContext.FişEkranı, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                                 CommandParameter="{Binding}"
                                                 Content="FİŞ"
-                                                Style="{hc:StaticResource ButtonSuccess}" />
+                                                Style="{hc:StaticResource ButtonInfo}" />
                                         </StackPanel>
-                                        <Button HorizontalAlignment="Stretch"
-                                            Command="{Binding DataContext.MasaEkSiparişKaydet, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding Mode=OneWay}"
-                                            Content="İLAVE SİPARİŞ EKLE"
-                                            Style="{hc:StaticResource ButtonWarning}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <GroupBox Grid.Row="1" Margin="2" Header="SEÇİLİ SİPARİŞ DETAYI">
+                                <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
+                                    ItemTemplate="{DynamicResource ListBoxSiparişItemTemplate}"
+                                    ItemsSource="{Binding Siparişler.Sipariş}"
+                                    Style="{hc:StaticResource ListBoxModernStyle}" />
+                            </GroupBox>
+                            <Button Grid.Row="2" HorizontalAlignment="Stretch"
+                                Command="{Binding MasaSiparişKaydet}"
+                                Content="SİPARİŞ KAYDET"
+                                Style="{hc:StaticResource ButtonDanger}" />
+                        </Grid>
                     </GroupBox>
                     <hc:TransitioningContentControl Grid.Column="2" Margin="2" TransitionMode="Right2LeftWithFade">
                         <GroupBox Header="ÜRÜNLER">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition Height="150" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <ItemsControl d:ItemsSource="{d:SampleData ItemCount=5}"
-                                    ItemsSource="{Binding Veriler.Ürünler.Ürün}"
-                                    Style="{DynamicResource VirtualizingStackPanelItemsControl}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="2" BorderBrush="Black" BorderThickness="1"
-                                                CornerRadius="3">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition />
-                                                    </Grid.RowDefinitions>
-                                                    <hc:NumericUpDown IsEnabled="{Binding IsEnabled, ElementName=BtnÜrün}"
-                                                        IsReadOnly="False" Minimum="1"
-                                                        Style="{hc:StaticResource NumericUpDownExtend}"
-                                                        Value="{Binding SiparişAdet}" />
-                                                    <Button x:Name="BtnÜrün" Grid.Row="1" Height="110"
-                                                        HorizontalAlignment="Stretch"
-                                                        Command="{Binding DataContext.MasaSiparişEkle, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
-                                                        CommandParameter="{Binding Mode=OneWay}"
-                                                        Style="{hc:StaticResource ButtonPrimary}">
-                                                        <StackPanel>
-                                                            <TextBlock HorizontalAlignment="Center">
-                                                                <Run Text="{Binding Açıklama}" />
-                                                                <LineBreak />
-                                                                <Run Text="{Binding Fiyat, StringFormat=\{0:C\}}" />
-                                                            </TextBlock>
-                                                            <Image Width="64" Height="64"
-                                                                Source="{Binding Resim, Converter={StaticResource FilePathMergeConverter}}" />
-                                                        </StackPanel>
-                                                    </Button>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <local:VirtualizingTilePanel Margin="0,0,20,0" d:Columns="4" ChildHeight="135"
-                                                Columns="4" Tile="False" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                                <GroupBox Grid.Row="1" Margin="2" Header="SEÇİLİ SİPARİŞ DETAYI">
-                                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
-                                        ItemTemplate="{DynamicResource ListBoxSiparişItemTemplate}"
-                                        ItemsSource="{Binding Siparişler.Sipariş}"
-                                        Style="{hc:StaticResource ListBoxModernStyle}" />
-                                </GroupBox>
-                                <Button Grid.Row="2" HorizontalAlignment="Stretch"
-                                    Command="{Binding MasaSiparişKaydet}"
-                                    Content="SİPARİŞ KAYDET"
-                                    Style="{hc:StaticResource ButtonDanger}" />
-                            </Grid>
+                            <ItemsControl d:ItemsSource="{d:SampleData ItemCount=5}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Ürünler}}">
+                                <ItemsControl.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Name}" Value="true">
+                                                                    <Setter Property="Text" Value="Favori" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Name}" Value="false">
+                                                                    <Setter Property="Text" Value="--------------------------" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ItemsControl.GroupStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="2" BorderBrush="Black" BorderThickness="1"
+                                            CornerRadius="3">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <hc:NumericUpDown IsEnabled="{Binding IsEnabled, ElementName=BtnÜrün}"
+                                                    IsReadOnly="False" Minimum="1"
+                                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                                    Value="{Binding SiparişAdet}" />
+                                                <Button x:Name="BtnÜrün" Grid.Row="1" Height="76"
+                                                    HorizontalAlignment="Stretch"
+                                                    Command="{Binding DataContext.MasaSiparişEkle, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding Mode=OneWay}"
+                                                    Style="{hc:StaticResource ButtonPrimary}">
+                                                    <StackPanel ToolTip="{Binding Açıklama}">
+                                                        <TextBlock HorizontalAlignment="Center" Text="{Binding Fiyat, StringFormat=\{0:C\}}" />
+                                                        <Image Width="48" Height="48"
+                                                            Source="{Binding Resim, Converter={StaticResource FilePathMergeConverter}}" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="5" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </GroupBox>
                     </hc:TransitioningContentControl>
                 </Grid>
@@ -180,6 +221,7 @@
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     ToolTip="Bu Adetten Aşağı Ürün Kalırsa Uyarı Ver"
                                     Value="{Binding Ürün.UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="FAVORİ" IsChecked="{Binding Ürün.Favori}" />
                                 <HeaderedContentControl Header="ÜRÜN RESİM">
                                     <Button HorizontalAlignment="Stretch"
                                         Command="{Binding ÜrünResimYükle}"
@@ -258,6 +300,7 @@
                     <hc:TransitioningContentControl TransitionMode="Right2LeftWithFade">
                         <GroupBox Header="MASA GİRİŞİ">
                             <hc:SimpleStackPanel>
+                                <TextBox Text="{Binding SalonAdı, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <hc:NumericUpDown hc:InfoElement.Title="MASA EN ADETİ" hc:InfoElement.TitlePlacement="Top" Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     Value="{Binding En}" />
@@ -296,8 +339,10 @@
                     <hc:ComboBox hc:InfoElement.Placeholder="YILI SEÇİN"
                         ItemsSource="{Binding Yıllar}"
                         SelectedItem="{Binding SeçiliYıl}" />
-                    <DataGrid Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
-                        CanUserDeleteRows="False" IsReadOnly="True"
+                    <DataGrid Grid.Row="1"
+                        d:ItemsSource="{d:SampleData ItemCount=5}"
+                        AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                        IsReadOnly="True"
                         ItemsSource="{Binding YıllarSiparişDurumu}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Id}" Header="AY" />
