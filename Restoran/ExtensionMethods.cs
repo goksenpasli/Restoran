@@ -6,8 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Xps;
+using System.Windows.Xps.Packaging;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Restoran.Model;
@@ -122,6 +125,20 @@ namespace Restoran
                     }
                 }
             }
+        }
+
+        public static FixedDocumentSequence WriteXPS(this FlowDocument flowDocument)
+        {
+            string temp = Path.GetTempFileName();
+            if (File.Exists(temp))
+            {
+                File.Delete(temp);
+            }
+
+            XpsDocument xpsDoc = new(temp, FileAccess.ReadWrite);
+            XpsDocumentWriter xpsWriter = XpsDocument.CreateXpsDocumentWriter(xpsDoc);
+            xpsWriter.Write((flowDocument as IDocumentPaginatorSource)?.DocumentPaginator);
+            return xpsDoc.GetFixedDocumentSequence();
         }
 
         internal static T DeSerialize<T>(this string xmldatapath) where T : class, new()

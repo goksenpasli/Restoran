@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
+using DotLiquid;
 using Restoran.ViewModel;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Ürün")]
-    public class Ürün : INotifyPropertyChanged
+    public class Ürün : INotifyPropertyChanged, ILiquidizable
     {
         public Ürün()
         {
@@ -50,5 +51,10 @@ namespace Restoran.Model
 
         [XmlAttribute(AttributeName = "UyarıAdet")]
         public int UyarıAdet { get; set; } = 50;
+
+        public object ToLiquid()
+        {
+            return new { Adet, Açıklama,Fiyat,Id };
+        }
     }
 }

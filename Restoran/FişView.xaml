@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Restoran.FişView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:local="clr-namespace:Restoran"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodel="clr-namespace:Restoran.ViewModel" Width="6.5cm" Height="500"
+    d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+    UseLayoutRounding="True" mc:Ignorable="d">
+    <GroupBox Header="FİŞ ÖZETİ">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DocumentViewer x:Name="DocViewer" />
+            <Button Grid.Row="1" HorizontalAlignment="Stretch" Command="hc:ControlCommands.Close"
+                Content="KAPAT"
+                Style="{hc:StaticResource ButtonWarning}" />
+        </Grid>
+    </GroupBox>
+</UserControl>

@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
+using DotLiquid;
 using HandyControl.Controls;
 using HandyControl.Data;
 using Microsoft.Win32;
 using Restoran.Model;
+using dotTemplate = DotLiquid.Template;
 
 namespace Restoran.ViewModel
 {
@@ -179,6 +184,23 @@ namespace Restoran.ViewModel
                 }
             }, parameter => true);
 
+            FişEkranı = new RelayCommand<object>(parameter =>
+            {
+                if (File.Exists("Report\\report.lqd"))
+                {
+                    using FileStream stream = new("Report\\report.lqd", FileMode.Open);
+                    using StreamReader reader = new(stream);
+                    dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
+                    Hash docContext = CreateDocumentContext(parameter as Siparişler);
+                    string docString = template.Render(docContext);
+                    FişView fiş = new();
+                    FlowDocument fd = (FlowDocument)XamlReader.Parse(docString);
+                    fiş.DocViewer.Document = fd.WriteXPS();
+
+                    Dialog.Show(fiş);
+                }
+            }, parameter => true);
+
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
             PropertyChanged += MainViewModel_PropertyChanged;
@@ -193,6 +215,8 @@ namespace Restoran.ViewModel
         public int Boy { get; set; } = 1;
 
         public int En { get; set; } = 1;
+
+        public ICommand FişEkranı { get; }
 
         public ICommand MasaEkSiparişKaydet { get; }
 
@@ -233,6 +257,15 @@ namespace Restoran.ViewModel
         public ICommand WebAdreseGit { get; }
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
+
+        private Hash CreateDocumentContext(Siparişler siparişler)
+        {
+            ObservableCollection<Ürün> ürünler = ExtensionMethods.ÜrünleriYükle();
+            return Hash.FromAnonymousObject(new
+            {
+                Siparişler = siparişler?.Sipariş.Select(sipariş => new Ürün() { Fiyat = ürünler.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = ürünler.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama })
+            });
+        }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
