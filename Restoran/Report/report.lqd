@@ -1,6 +1,6 @@
 <FlowDocument xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		 xmlns:sys="clr-namespace:System;assembly=mscorlib"
-	 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontFamily="Times New Roman" PageWidth="5.6cm">
+	 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontFamily="Segoe UI" PageWidth="5.6cm">
 	<Paragraph Margin="0" FontSize="24" TextAlignment="Center" Foreground="Black">
 		FİŞ
 	</Paragraph>
@@ -11,7 +11,7 @@
 	<Paragraph Margin="0" FontSize="16">
 		<Run Text="{{ sipariş.Adet}}" Foreground="Black"/>
 		<Run Text="{{ sipariş.Açıklama }}" Foreground="Black"/>
-		<Run Text="{{ sipariş.Fiyat|times:sipariş.Adet| append: " TL"}}" FontWeight="Bold" Foreground="Black"/>
+		<Run Text="{{ sipariş.Fiyat|times:sipariş.Adet|currency:c}}" FontWeight="Bold" Foreground="Black"/>
 	</Paragraph>
 	{% endfor -%}
 	<BlockUIContainer>
@@ -19,6 +19,6 @@
 	</BlockUIContainer>
 	<Paragraph Margin="0" Foreground="Black">
 		<Run Text="TOPLAM:" />
-		<Run Text="{{ Toplam| append: " TL"}}" FontWeight="Bold" />
+		<Run Text="{{ Toplam|currency:c}}" FontWeight="Bold" />
 	</Paragraph>
 </FlowDocument>

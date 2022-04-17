@@ -21,6 +21,9 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "Kapasite")]
         public int Kapasite { get; set; }
 
+        [XmlIgnore]
+        public bool MasaToplamSiparişDurumuGöster { get; set; }
+
         [XmlAttribute(AttributeName = "No")]
         public int No { get; set; }
 

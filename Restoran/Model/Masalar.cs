@@ -21,6 +21,9 @@ namespace Restoran.Model
         [XmlElement(ElementName = "Masa")]
         public ObservableCollection<Masa> Masa { get; set; } = new();
 
+        [XmlIgnore]
+        public bool MasaDurumunuGöster { get; set; }
+
         [XmlAttribute(AttributeName = "SalonAdı")]
         public string SalonAdı { get; set; }
 

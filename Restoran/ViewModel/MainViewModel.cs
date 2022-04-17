@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -96,6 +95,17 @@ namespace Restoran.ViewModel
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
+            MasaToplamSiparişDurumuGöster = new RelayCommand<object>(parameter =>
+            {
+                if (parameter is Masalar masalar)
+                {
+                    foreach (Masa item in masalar.Masa.ToList())
+                    {
+                        item.MasaToplamSiparişDurumuGöster = masalar.MasaDurumunuGöster;
+                    }
+                }
+            }, parameter => true);
+
             MasaSiparişKaydet = new RelayCommand<object>(parameter =>
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
@@ -133,6 +143,7 @@ namespace Restoran.ViewModel
 
                     DatabaseSave.Execute(null);
                     Growl.Success("Tahsil Edildi.");
+                    OnPropertyChanged(nameof(Masalar));
                 }
             }, parameter => parameter is Siparişler sipariş && sipariş?.Ödendi == false);
 
@@ -207,6 +218,7 @@ namespace Restoran.ViewModel
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
             Masalar = Veriler.Salonlar.Masalar.FirstOrDefault();
+            SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
 
             PropertyChanged += MainViewModel_PropertyChanged;
         }
@@ -237,11 +249,15 @@ namespace Restoran.ViewModel
 
         public ICommand MasaSiparişSil { get; }
 
+        public ICommand MasaToplamSiparişDurumuGöster { get; }
+
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
 
         public string SalonAdı { get; set; }
 
         public bool SalonTabSelected { get; set; } = true;
+
+        public double SeçiliSalonGünlükSiparişToplamı { get; set; }
 
         public int SeçiliYıl { get; set; } = DateTime.Now.Year;
 
@@ -265,12 +281,16 @@ namespace Restoran.ViewModel
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
 
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private Hash CreateDocumentContext(object siparişler)
         {
-            ObservableCollection<Ürün> ürünler = ExtensionMethods.ÜrünleriYükle();
             return Hash.FromAnonymousObject(new
             {
-                Siparişler = (siparişler as Siparişler)?.Sipariş.Select(sipariş => new Ürün() { Fiyat = ürünler.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = ürünler.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
+                Siparişler = (siparişler as Siparişler)?.Sipariş.Select(sipariş => new Ürün() { Fiyat = Veriler.Ürünler.Ürün.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
                 Toplam = (siparişler as Siparişler)?.Sipariş.SiparişToplamları()
             });
         }
@@ -306,6 +326,10 @@ namespace Restoran.ViewModel
                     return;
                 }
                 MainWindow.cvs.Filter += (s, e) => e.Accepted = (e.Item as Siparişler)?.Tarih > DateTime.Today;
+            }
+            if (e.PropertyName is "Masalar")
+            {
+                SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
             }
         }
 

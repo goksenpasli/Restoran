@@ -47,8 +47,9 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <hc:TransitioningContentControl Grid.RowSpan="2" Margin="2" TransitionMode="Bottom2TopWithFade">
+                    <hc:TransitioningContentControl Margin="2" TransitionMode="Bottom2TopWithFade">
                         <hc:TabControl d:ItemsSource="{d:SampleData ItemCount=5}"
                             ItemsSource="{Binding Veriler.Salonlar.Masalar}"
                             SelectedItem="{Binding Masalar}"
@@ -56,7 +57,15 @@
                             Style="{hc:StaticResource TabControlCapsuleSolid}">
                             <TabControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SalonAdı}" />
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding SalonAdı}" />
+                                        <ToggleButton HorizontalAlignment="Stretch"
+                                            Background="{DynamicResource StatisticDrawing}"
+                                            BorderBrush="{x:Null}"
+                                            Command="{Binding DataContext.MasaToplamSiparişDurumuGöster, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            IsChecked="{Binding MasaDurumunuGöster}" />
+                                    </StackPanel>
                                 </DataTemplate>
                             </TabControl.ItemTemplate>
                             <TabControl.ContentTemplate>
@@ -66,7 +75,7 @@
                             </TabControl.ContentTemplate>
                         </hc:TabControl>
                     </hc:TransitioningContentControl>
-                    <GroupBox Grid.RowSpan="2" Grid.Column="1" Margin="2">
+                    <GroupBox Grid.Column="1" Margin="2">
                         <GroupBox.Header>
                             <CheckBox Content="TÜM KAYITLAR" IsChecked="{Binding TümKayıtlar}" />
                         </GroupBox.Header>
@@ -146,9 +155,6 @@
                                                                 <DataTrigger Binding="{Binding Name}" Value="true">
                                                                     <Setter Property="Text" Value="Favori" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Name}" Value="false">
-                                                                    <Setter Property="Text" Value="--------------------------" />
-                                                                </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
@@ -193,6 +199,14 @@
                             </ItemsControl>
                         </GroupBox>
                     </hc:TransitioningContentControl>
+                    <StatusBar Grid.Row="1" Grid.ColumnSpan="3"
+                        Background="{hc:StaticResource DangerBrush}"
+                        Style="{hc:StaticResource StatusBarBaseStyle}">
+                        <StatusBarItem>
+                            <TextBlock d:Text="SeçiliSalonGünlükSiparişToplamı" Foreground="White"
+                                Text="{Binding SeçiliSalonGünlükSiparişToplamı, StringFormat=Seçili Salon Günlük Toplam \{0:C\}}" />
+                        </StatusBarItem>
+                    </StatusBar>
                 </Grid>
             </hc:TabItem>
             <hc:TabItem Header="ÜRÜN GİRİŞİ">
@@ -249,6 +263,7 @@
                                                 FontWeight="Bold"
                                                 Text="{Binding Açıklama}" />
                                             <StackPanel Orientation="Horizontal">
+                                                <CheckBox Content="FAVORİ" IsChecked="{Binding Favori}" />
                                                 <Image Width="64" Height="64"
                                                     Source="{Binding Resim, Converter={StaticResource FilePathMergeConverter}}" />
                                                 <hc:NumericUpDown hc:InfoElement.Title="FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
