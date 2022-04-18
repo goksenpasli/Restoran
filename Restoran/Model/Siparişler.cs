@@ -2,13 +2,32 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using PropertyChanged;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Siparişler")]
     public class Siparişler : INotifyPropertyChanged
     {
+        private double farkDakika;
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        [XmlIgnore]
+        [DependsOn("TahsilatTarih", "Tarih")]
+        public double FarkDakika
+        {
+            get
+            {
+                if (TahsilatTarih != DateTime.MinValue)
+                {
+                    return Math.Round(TahsilatTarih.Subtract(Tarih).TotalMinutes, 2);
+                }
+                return 0;
+            }
+
+            set => farkDakika = value;
+        }
 
         [XmlAttribute(AttributeName = "Id")]
         public int Id { get; set; }
@@ -18,6 +37,9 @@ namespace Restoran.Model
 
         [XmlElement(ElementName = "Sipariş")]
         public ObservableCollection<Sipariş> Sipariş { get; set; } = new();
+
+        [XmlAttribute(AttributeName = "TahsilatTarih")]
+        public DateTime TahsilatTarih { get; set; }
 
         [XmlAttribute(AttributeName = "Tarih")]
         public DateTime Tarih { get; set; }

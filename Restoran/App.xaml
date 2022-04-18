@@ -180,7 +180,7 @@
                         ItemsSource="{Binding DataContext.Veriler.Ürünler.Ürün, RelativeSource={RelativeSource AncestorType=Window}}"
                         SelectedValue="{Binding ÜrünId}"
                         SelectedValuePath="Id"
-                        Template="{DynamicResource ComboBoxSimpleTemplate}">
+                        Template="{StaticResource ComboBoxSimpleTemplate}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold"
@@ -193,9 +193,10 @@
             <DataTemplate x:Key="ListBoxSiparişItemTemplate">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource SiparişItemTemplate}" />
-                    <Button Command="{Binding DataContext.MasaSiparişSil, RelativeSource={RelativeSource AncestorType=Window}}"
+                    <Button Command="{Binding DataContext.SeçiliSiparişSil, RelativeSource={RelativeSource AncestorType=Window}}"
                         CommandParameter="{Binding Mode=OneWay}"
-                        Content="SİL" />
+                        Content="SİL"
+                        Style="{hc:StaticResource ButtonDanger}" />
                 </StackPanel>
             </DataTemplate>
             <Style x:Key="MessageBoxCustom"

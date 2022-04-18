@@ -6,6 +6,10 @@
 	</Paragraph>
 	<Paragraph Margin="0" FontSize="16">
 		<Run Foreground="Black" Text="{Binding Mode=OneWay, Source={x:Static sys:DateTime.Now}}" />
+	</Paragraph>	
+	<Paragraph Margin="0" FontSize="16">
+		<Run Text="MASA NO:" />
+		<Run Foreground="Black" Text="{{MasaNo}}" FontWeight="Bold"/>
 	</Paragraph>
 	{% for sipariş in Siparişler -%}
 	<Paragraph Margin="0" FontSize="16">

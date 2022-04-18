@@ -42,8 +42,8 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotLiquid, Version=2.2.610.0, Culture=neutral, PublicKeyToken=82e46016ecf9f07c, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotLiquid.2.2.610\lib\net45\DotLiquid.dll</HintPath>
+    <Reference Include="DotLiquid, Version=2.2.614.0, Culture=neutral, PublicKeyToken=82e46016ecf9f07c, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotLiquid.2.2.614\lib\net45\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="HandyControl, Version=3.3.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
       <HintPath>..\packages\HandyControls.3.3.11\lib\net46\HandyControl.dll</HintPath>

@@ -39,20 +39,28 @@ namespace Restoran.ViewModel
                 Salonlar = ExtensionMethods.Salonlar(),
                 Ürünler = ExtensionMethods.Ürünler()
             };
+            Ürün = new Ürün();
+            Siparişler = new();
 
             VerileriYükle();
+            Masalar = Veriler.Salonlar.Masalar.FirstOrDefault();
+            SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
+
+            PropertyChanged += MainViewModel_PropertyChanged;
+
+            #region Commands
 
             DatabaseSave = new RelayCommand<object>(parameter =>
-            {
-                try
                 {
-                    Veriler.Serialize();
-                }
-                catch (Exception Ex)
-                {
-                    _ = HandyControl.Controls.MessageBox.Show(Ex.Message);
-                }
-            }, parameter => File.Exists(xmldatapath));
+                    try
+                    {
+                        Veriler.Serialize();
+                    }
+                    catch (Exception Ex)
+                    {
+                        _ = HandyControl.Controls.MessageBox.Show(Ex.Message);
+                    }
+                }, parameter => File.Exists(xmldatapath));
 
             MasaOluştur = new RelayCommand<object>(parameter =>
             {
@@ -63,7 +71,6 @@ namespace Restoran.ViewModel
                 }
             }, parameter => true);
 
-            Siparişler = new();
             MasaSiparişEkle = new RelayCommand<object>(parameter =>
             {
                 if (parameter is Ürün ürün)
@@ -87,11 +94,24 @@ namespace Restoran.ViewModel
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
-            MasaSiparişSil = new RelayCommand<object>(parameter =>
+            SeçiliSiparişSil = new RelayCommand<object>(parameter =>
             {
                 if (parameter is Sipariş sipariş)
                 {
                     _ = Siparişler.Sipariş.Remove(sipariş);
+                }
+            }, parameter => Masalar?.SeçiliMasa is not null);
+
+            MasaSiparişSil = new RelayCommand<object>(parameter =>
+            {
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Seçili Sipariş Silinsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                {
+                    if (parameter is Siparişler siparişler)
+                    {
+                        _ = Masalar?.SeçiliMasa?.Siparişler?.Remove(siparişler);
+                        Masalar.SeçiliMasa.Dolu = false;
+                        DatabaseSave.Execute(null);
+                    }
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
@@ -108,7 +128,7 @@ namespace Restoran.ViewModel
 
             MasaSiparişKaydet = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Sipariş Kaydını Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Sipariş Kaydını Onaylıyor musun?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
                     Masalar?.SeçiliMasa?.Siparişler?.Add(Siparişler);
                     Masalar.SeçiliMasa.Dolu = true;
@@ -134,10 +154,11 @@ namespace Restoran.ViewModel
 
             SiparişTahsilEt = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Siparişler siparişler)
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Siparişler siparişler)
                 {
                     siparişler.Ödendi = true;
                     siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
+                    siparişler.TahsilatTarih = DateTime.Now;
                     Masalar.SeçiliMasa.Dolu = false;
                     ExtensionMethods.ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
 
@@ -149,7 +170,7 @@ namespace Restoran.ViewModel
 
             MasaKaydet = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Düzen Kaydedilsin mi? Bu Düzen Daha Değiştirilmeyecektir.", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Düzen Kaydedilsin mi? Bu Düzen Daha Değiştirilmeyecektir.", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
                     Masalar masalar = new()
                     {
@@ -170,10 +191,9 @@ namespace Restoran.ViewModel
                 }
             }, parameter => ÖnizlemeMasa?.Count(z => !z.Gizli) > 0 && !string.IsNullOrWhiteSpace(SalonAdı));
 
-            Ürün = new Ürün();
             ÜrünKaydet = new RelayCommand<object>(parameter =>
             {
-                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Ürün Kaydedilsin mi?", Caption = "Kaydet", Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Ürün Kaydedilsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
                     Ürün ürün = new()
                     {
@@ -207,20 +227,17 @@ namespace Restoran.ViewModel
             {
                 if (File.Exists("Report\\report.lqd"))
                 {
-                    string template = GenerateTemplate(parameter, "Report\\report.lqd");
+                    string template = GenerateTemplate("Report\\report.lqd");
                     FişView fiş = new();
                     FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
                     fiş.DocViewer.Document = fd.WriteXPS();
                     _ = Dialog.Show(fiş);
                 }
-            }, parameter => true);
+            }, parameter => SeçiliSipariş is not null);
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
-            Masalar = Veriler.Salonlar.Masalar.FirstOrDefault();
-            SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
-
-            PropertyChanged += MainViewModel_PropertyChanged;
+            #endregion Commands
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -259,6 +276,10 @@ namespace Restoran.ViewModel
 
         public double SeçiliSalonGünlükSiparişToplamı { get; set; }
 
+        public Siparişler SeçiliSipariş { get; set; }
+
+        public ICommand SeçiliSiparişSil { get; }
+
         public int SeçiliYıl { get; set; } = DateTime.Now.Year;
 
         public Siparişler Siparişler { get; set; }
@@ -286,21 +307,22 @@ namespace Restoran.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private Hash CreateDocumentContext(object siparişler)
+        private Hash CreateDocumentContext()
         {
             return Hash.FromAnonymousObject(new
             {
-                Siparişler = (siparişler as Siparişler)?.Sipariş.Select(sipariş => new Ürün() { Fiyat = Veriler.Ürünler.Ürün.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
-                Toplam = (siparişler as Siparişler)?.Sipariş.SiparişToplamları()
+                Siparişler = SeçiliSipariş?.Sipariş.Select(sipariş => new Ürün() { Fiyat = Veriler.Ürünler.Ürün.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
+                Toplam = SeçiliSipariş?.Sipariş.SiparişToplamları(),
+                MasaNo = Masalar.SeçiliMasa.No
             });
         }
 
-        private string GenerateTemplate(object parameter, string reportpath)
+        private string GenerateTemplate(string reportpath)
         {
             using FileStream stream = new(reportpath, FileMode.Open);
             using StreamReader reader = new(stream);
             dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
-            Hash docContext = CreateDocumentContext(parameter as Siparişler);
+            Hash docContext = CreateDocumentContext();
             return template.Render(docContext);
         }
 

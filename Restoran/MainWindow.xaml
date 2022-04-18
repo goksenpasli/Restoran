@@ -42,7 +42,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
-                        <ColumnDefinition Width="360" />
+                        <ColumnDefinition Width="395" />
                         <ColumnDefinition Width="360" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -70,7 +70,7 @@
                             </TabControl.ItemTemplate>
                             <TabControl.ContentTemplate>
                                 <DataTemplate>
-                                    <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
+                                    <ContentPresenter Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
                                 </DataTemplate>
                             </TabControl.ContentTemplate>
                         </hc:TabControl>
@@ -87,7 +87,8 @@
                             </Grid.RowDefinitions>
                             <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
                                 IsSynchronizedWithCurrentItem="False"
-                                ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}">
+                                ItemsSource="{Binding Mode=OneWay, Source={StaticResource Siparişler}}"
+                                SelectedItem="{Binding SeçiliSipariş}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -101,7 +102,11 @@
                                                                 Text="{Binding Sipariş, Converter={StaticResource SiparişSumConverter}, StringFormat=\{0:C\}}" />
                                                         </StackPanel>
                                                     </StackPanel.ToolTip>
-                                                    <TextBlock VerticalAlignment="Center" Text="{Binding Tarih, StringFormat=\{0:g\}}" />
+                                                    <TextBlock VerticalAlignment="Center">
+                                                        <Run Text="{Binding Tarih, StringFormat=\{0:g\}}" />
+                                                        <LineBreak />
+                                                        <Run Text="{Binding FarkDakika, StringFormat={}{0} Dakika}" />
+                                                    </TextBlock>
                                                     <CheckBox IsChecked="{Binding Ödendi}" IsEnabled="False">
                                                         <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
                                                             IsReadOnly="True"
@@ -122,9 +127,15 @@
                                             </StackPanel>
                                             <Button Height="65"
                                                 Command="{Binding DataContext.FişEkranı, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                                CommandParameter="{Binding}"
                                                 Content="FİŞ"
+                                                IsEnabled="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                                 Style="{hc:StaticResource ButtonInfo}" />
+                                            <Button Height="65"
+                                                Command="{Binding DataContext.MasaSiparişSil, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                CommandParameter="{Binding}"
+                                                Content="SİL"
+                                                IsEnabled="{Binding Ödendi, Converter={StaticResource Boolean2BooleanReConverter}}"
+                                                Style="{hc:StaticResource ButtonDanger}" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
