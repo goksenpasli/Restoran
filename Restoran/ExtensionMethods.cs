@@ -172,6 +172,15 @@ namespace Restoran
             return list;
         }
 
+        internal static Kategoriler Kategoriler()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                           ? null
+                           : File.Exists(MainViewModel.xmldatapath)
+                           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler
+                           : new Kategoriler();
+        }
+
         internal static ObservableCollection<Masalar> MasalarıYükle()
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
@@ -233,6 +242,15 @@ namespace Restoran
                      : File.Exists(MainViewModel.xmldatapath)
                      ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Ürünler.Ürün
                      : new ObservableCollection<Ürün>();
+        }
+
+        internal static ObservableCollection<Kategori> KategorileriYükle()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                   ? null
+                   : File.Exists(MainViewModel.xmldatapath)
+                   ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler.Kategori
+                   : new ObservableCollection<Kategori>();
         }
     }
 }

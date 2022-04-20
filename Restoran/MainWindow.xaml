@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:Restoran.ViewModel" Title="Restoran"
     d:DataContext="{d:DesignInstance Type={x:Type viewmodel:MainViewModel}}"
-    d:Height="450" d:Width="1024" hc:WindowAttach.IsDragElement="True"
+    d:Height="800" d:Width="1024" hc:WindowAttach.IsDragElement="True"
     ShowTitle="False" UseLayoutRounding="True" WindowStartupLocation="CenterScreen"
     WindowState="Maximized" mc:Ignorable="d">
     <hc:Window.NonClientAreaContent>
@@ -153,7 +153,21 @@
                         </Grid>
                     </GroupBox>
                     <hc:TransitioningContentControl Grid.Column="2" Margin="2" TransitionMode="Right2LeftWithFade">
-                        <GroupBox Header="ÜRÜNLER">
+                        <GroupBox>
+                            <GroupBox.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <hc:SearchBar Width="200" hc:InfoElement.Placeholder="ÜRÜN ARA" hc:InfoElement.Title="ÜRÜNLER"
+                                        hc:InfoElement.TitlePlacement="Left"
+                                        Command="{Binding ÜrünAra}"
+                                        IsRealTime="True" ShowClearButton="True"
+                                        Style="{StaticResource SearchBarPlusBaseStyle}"
+                                        Text="{Binding ÜrünAramaMetin, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:ComboBox Width="120" hc:InfoElement.Placeholder="KATEGORİ" DisplayMemberPath="Açıklama"
+                                        ItemsSource="{Binding Veriler.Kategoriler.Kategori}"
+                                        SelectedItem="{Binding AramaSeçiliKategori}"
+                                        ShowClearButton="True" />
+                                </StackPanel>
+                            </GroupBox.Header>
                             <ItemsControl d:ItemsSource="{d:SampleData ItemCount=5}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Ürünler}}">
                                 <ItemsControl.GroupStyle>
                                     <GroupStyle>
@@ -189,8 +203,8 @@
                                                     Value="{Binding SiparişAdet}" />
                                                 <Button x:Name="BtnÜrün" Grid.Row="1" Height="76"
                                                     HorizontalAlignment="Stretch"
-                                                    Command="{Binding DataContext.MasaSiparişEkle, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
-                                                    CommandParameter="{Binding Mode=OneWay}"
+                                                    Command="{Binding DataContext.MasaSiparişArtır, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                    CommandParameter="{Binding}"
                                                     Style="{hc:StaticResource ButtonPrimary}">
                                                     <StackPanel ToolTip="{Binding Açıklama}">
                                                         <TextBlock HorizontalAlignment="Center" Text="{Binding Fiyat, StringFormat=\{0:C\}}" />
@@ -225,18 +239,29 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200" />
                         <ColumnDefinition />
+                        <ColumnDefinition Width="200" />
                     </Grid.ColumnDefinitions>
                     <hc:TransitioningContentControl TransitionMode="Bottom2Top">
                         <GroupBox Header="ÜRÜN GİRİŞİ">
                             <StackPanel>
-                                <HeaderedContentControl Header="ÜRÜN ADI">
-                                    <TextBox Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
-                                </HeaderedContentControl>
-                                <hc:NumericUpDown hc:InfoElement.Title="FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                <hc:TextBox hc:InfoElement.Placeholder="ÜRÜN ADINI YAZIN" hc:InfoElement.Title="ÜRÜN ADI"
+                                    Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
+                                <hc:ComboBox hc:InfoElement.Placeholder="KATEGORİ SEÇİN" hc:InfoElement.Title="KATEGORİ"
+                                    DisplayMemberPath="Açıklama"
+                                    ItemsSource="{Binding Veriler.Kategoriler.Kategori}"
+                                    SelectedItem="{Binding SeçiliKategori}" />
+                                <hc:NumericUpDown hc:InfoElement.Title="ALIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
                                     Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
+                                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
                                     ValueFormat="C"
-                                    Value="{Binding Ürün.Fiyat, UpdateSourceTrigger=PropertyChanged}" />
+                                    Value="{Binding Ürün.AlışFiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                    Minimum="1"
+                                    Style="{hc:StaticResource NumericUpDownExtend}"
+                                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                                    ValueFormat="C"
+                                    Value="{Binding Ürün.Fiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
                                     Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
@@ -277,7 +302,9 @@
                                                 <CheckBox Content="FAVORİ" IsChecked="{Binding Favori}" />
                                                 <Image Width="64" Height="64"
                                                     Source="{Binding Resim, Converter={StaticResource FilePathMergeConverter}}" />
-                                                <hc:NumericUpDown hc:InfoElement.Title="FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                                <Rectangle Width="1" Margin="2" VerticalAlignment="Stretch"
+                                                    Stroke="Black" />
+                                                <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
                                                     Minimum="1"
                                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                                     ValueFormat="C"
@@ -308,6 +335,15 @@
                                                     Minimum="0"
                                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                                     Value="{Binding UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
+                                                <Rectangle Width="1" Margin="2" VerticalAlignment="Stretch"
+                                                    Stroke="Black" />
+                                                <ComboBox VerticalAlignment="Center" VerticalContentAlignment="Center" d:Width="50"
+                                                    DisplayMemberPath="Açıklama" FontSize="20" FontWeight="Bold"
+                                                    IsEnabled="False"
+                                                    ItemsSource="{Binding DataContext.Veriler.Kategoriler.Kategori, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    SelectedValue="{Binding KategoriId}"
+                                                    SelectedValuePath="Id"
+                                                    Template="{StaticResource ComboBoxSimpleTemplate}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
@@ -315,6 +351,36 @@
                             </ListBox>
                         </GroupBox>
                     </hc:TransitioningContentControl>
+                    <hc:TransitioningContentControl Grid.Column="2" TransitionMode="Right2LeftWithFade">
+                        <GroupBox Header="ÜRÜN KATEGORİ">
+                            <StackPanel>
+                                <hc:TextBox hc:InfoElement.Placeholder="KATEGORİ ADINI YAZIN" hc:InfoElement.Title="KATEGORİ ADI"
+                                    Text="{Binding Kategori.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button HorizontalAlignment="Stretch"
+                                    Command="{Binding KategoriKaydet}"
+                                    Content="KATEGORİ KAYDET"
+                                    Style="{hc:StaticResource ButtonDanger}" />
+                                <GroupBox Height="250" Header="KATEGORİLER">
+                                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" ItemsSource="{Binding Veriler.Kategoriler.Kategori}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Command="{Binding DataContext.KategoriSil, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{Binding Açıklama}"
+                                                    Style="{hc:StaticResource ButtonDanger}" />
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <local:VirtualizingTilePanel ChildHeight="32" Columns="2" Tile="False" />
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                    </ListBox>
+                                </GroupBox>
+                            </StackPanel>
+                        </GroupBox>
+                    </hc:TransitioningContentControl>
+
                 </Grid>
             </hc:TabItem>
             <hc:TabItem Header="DÜZEN OLUŞTUR">
@@ -326,7 +392,7 @@
                     <hc:TransitioningContentControl TransitionMode="Right2LeftWithFade">
                         <GroupBox Header="MASA GİRİŞİ">
                             <hc:SimpleStackPanel>
-                                <TextBox Text="{Binding SalonAdı, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <hc:TextBox hc:InfoElement.Placeholder="MASA ADINI YAZIN" Text="{Binding SalonAdı, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <hc:NumericUpDown hc:InfoElement.Title="MASA EN ADETİ" hc:InfoElement.TitlePlacement="Top" Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     Value="{Binding En}" />

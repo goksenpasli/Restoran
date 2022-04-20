@@ -9,7 +9,7 @@ using Restoran.ViewModel;
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Ürün")]
-    public class Ürün : INotifyPropertyChanged, ILiquidizable
+    public class Ürün : INotifyPropertyChanged, ILiquidizable, IDataErrorInfo
     {
         public Ürün()
         {
@@ -33,6 +33,9 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "Adet")]
         public int Adet { get; set; }
 
+        [XmlAttribute(AttributeName = "AlışFiyat")]
+        public double AlışFiyat { get; set; } = 1;
+
         [XmlAttribute(AttributeName = "Favori")]
         public bool Favori { get; set; }
 
@@ -40,7 +43,10 @@ namespace Restoran.Model
         public double Fiyat { get; set; } = 1;
 
         [XmlAttribute(AttributeName = "Id")]
-        public int Id { get; set; }
+        public int Id { get; set; }   
+        
+        [XmlAttribute(AttributeName = "KategoriId")]
+        public int KategoriId { get; set; }
 
         [XmlIgnore]
         public int İlaveÜrünAdeti { get; set; } = 1;
@@ -66,6 +72,14 @@ namespace Restoran.Model
 
         private void Ürün_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName is "AlışFiyat" )
+            {
+                if (AlışFiyat > Fiyat)
+                {
+                    Fiyat = AlışFiyat;
+                }
+            }
+
             if (e.PropertyName is "SiparişAdet")
             {
                 if (SiparişAdet > ExtensionMethods.ÜrünleriYükle().FirstOrDefault(z => z.Id == Id).Adet)
@@ -74,5 +88,15 @@ namespace Restoran.Model
                 }
             }
         }
+
+        public string Error => string.Empty;
+
+        public string this[string columnName] => columnName switch
+        {
+            "AlışFiyat" when AlışFiyat > Fiyat => "Alış Fiyatını Satış Fiyatından Fazla Girmeyin.",
+            "Fiyat" when Fiyat < AlışFiyat => "Satış Fiyatını Alış Fiyatından Az Girmeyin.",
+            _ => null
+        };
+
     }
 }

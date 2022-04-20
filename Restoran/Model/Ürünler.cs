@@ -11,5 +11,4 @@ namespace Restoran.Model
 
         [XmlElement(ElementName = "Ürün")]
         public ObservableCollection<Ürün> Ürün { get; set; }
-    }
-}
+    }    }

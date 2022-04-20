@@ -81,6 +81,8 @@
     <Compile Include="FişView.xaml.cs">
       <DependentUpon>FişView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Kategori.cs" />
+    <Compile Include="Model\Kategoriler.cs" />
     <Compile Include="Model\Salonlar.cs" />
     <Compile Include="Model\Veriler.cs" />
     <Compile Include="Model\Masa.cs" />

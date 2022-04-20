@@ -15,6 +15,9 @@ namespace Restoran.Model
         public Tahsilatlar Tahsilatlar { get; set; }
 
         [XmlElement(ElementName = "Ürünler")]
-        public Ürünler Ürünler { get; set; }
+        public Ürünler Ürünler { get; set; }  
+        
+        [XmlElement(ElementName = "Kategoriler")]
+        public Kategoriler Kategoriler { get; set; }
     }
 }
