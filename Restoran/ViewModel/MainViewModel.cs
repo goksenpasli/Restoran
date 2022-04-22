@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Markup;
 using DotLiquid;
 using HandyControl.Controls;
@@ -18,10 +15,8 @@ using dotTemplate = DotLiquid.Template;
 
 namespace Restoran.ViewModel
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : MainViewModelBase
     {
-        public static readonly string xmldatapath = Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) + @"\Data.xml";
-
         static MainViewModel()
         {
             Yıllar = Enumerable.Range(DateTime.Now.Year - 5, 10);
@@ -38,14 +33,15 @@ namespace Restoran.ViewModel
             {
                 Salonlar = ExtensionMethods.Salonlar(),
                 Ürünler = ExtensionMethods.Ürünler(),
-                Kategoriler = ExtensionMethods.Kategoriler()
+                Kategoriler = ExtensionMethods.Kategoriler(),
+                Müşteriler = ExtensionMethods.Müşteriler()
             };
             Ürün = new Ürün();
             Kategori = new Kategori();
-            Siparişler = new();
+            Siparişler = new Siparişler();
 
             VerileriYükle();
-            Masalar = Veriler.Salonlar.Masalar.FirstOrDefault();
+            Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
 
             PropertyChanged += MainViewModel_PropertyChanged;
@@ -232,9 +228,11 @@ namespace Restoran.ViewModel
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Kategori Kaydedilsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    var kategori = new Kategori();
-                    kategori.Açıklama = Kategori.Açıklama;
-                    kategori.Id = ExtensionMethods.RandomNumber();
+                    Kategori kategori = new()
+                    {
+                        Açıklama = Kategori.Açıklama,
+                        Id = ExtensionMethods.RandomNumber()
+                    };
 
                     Veriler?.Kategoriler?.Kategori?.Add(kategori);
                     DatabaseSave.Execute(null);
@@ -247,7 +245,7 @@ namespace Restoran.ViewModel
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Kategori Silinsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    Veriler?.Kategoriler?.Kategori?.Remove(parameter as Kategori);
+                    _ = (Veriler?.Kategoriler?.Kategori?.Remove(parameter as Kategori));
                     DatabaseSave.Execute(null);
                     Growl.Success("Kategori Silindi.");
                 }
@@ -274,105 +272,11 @@ namespace Restoran.ViewModel
                 }
             }, parameter => SeçiliSipariş is not null);
 
-            ÜrünAra = new RelayCommand<object>(parameter =>
-            {
-                MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.Açıklama.Contains(ÜrünAramaMetin) == true;
-            }, parameter => true);
+            ÜrünAra = new RelayCommand<object>(parameter => MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.Açıklama.Contains(ÜrünAramaMetin) == true, parameter => true);
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
             #endregion Commands
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public static ICommand DatabaseSave { get; set; }
-
-        public static IEnumerable<int> Yıllar { get; set; }
-
-        public Kategori AramaSeçiliKategori { get; set; }
-
-        public int Boy { get; set; } = 1;
-
-        public int En { get; set; } = 1;
-
-        public ICommand FişEkranı { get; }
-
-        public Kategori Kategori { get; set; }
-
-        public ICommand KategoriKaydet { get; }
-
-        public ICommand KategoriSil { get; }
-
-        public ICommand MasaEkSiparişKaydet { get; }
-
-        public ICommand MasaKaydet { get; }
-
-        public Masalar Masalar { get; set; }
-
-        public ICommand MasaOluştur { get; }
-
-        public ICommand MasaSiparişArtır { get; }
-
-        public ICommand MasaSiparişEkle { get; }
-
-        public ICommand MasaSiparişKaydet { get; }
-
-        public ICommand MasaSiparişSil { get; }
-
-        public ICommand MasaToplamSiparişDurumuGöster { get; }
-
-        public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
-
-        public string SalonAdı { get; set; }
-
-        public bool SalonTabSelected { get; set; } = true;
-
-        public Kategori SeçiliKategori { get; set; }
-
-        public double SeçiliSalonGünlükSiparişToplamı { get; set; }
-
-        public Siparişler SeçiliSipariş { get; set; }
-
-        public ICommand SeçiliSiparişSil { get; }
-
-        public int SeçiliYıl { get; set; } = DateTime.Now.Year;
-
-        public Siparişler Siparişler { get; set; }
-
-        public ICommand SiparişTahsilEt { get; }
-
-        public bool TahsilatTabSelected { get; set; }
-
-        public bool TümKayıtlar { get; set; } = true;
-
-        public Ürün Ürün { get; set; }
-
-        public ICommand ÜrünAra { get; }
-
-        public string ÜrünAramaMetin { get; set; }
-
-        public ICommand ÜrünKaydet { get; }
-
-        public ICommand ÜrünResimYükle { get; }
-
-        public Veriler Veriler { get; set; }
-
-        public ICommand WebAdreseGit { get; }
-
-        public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
-
-        public void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private static void DepoKontrol(double adet, double eşik)
-        {
-            if (adet < eşik)
-            {
-                Growl.Warning($"Dikkat Depoda Bu Üründen {eşik} Adetten Az Ürün Kaldı.");
-            }
         }
 
         private Hash CreateDocumentContext()
@@ -434,9 +338,13 @@ namespace Restoran.ViewModel
 
         private void VerileriYükle()
         {
-            Veriler.Ürünler.Ürün = ExtensionMethods.ÜrünleriYükle();
-            Veriler.Salonlar.Masalar = ExtensionMethods.MasalarıYükle();
-            Veriler.Kategoriler.Kategori = ExtensionMethods.KategorileriYükle();
+            if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            {
+                Veriler.Ürünler.Ürün = ExtensionMethods.ÜrünleriYükle();
+                Veriler.Salonlar.Masalar = ExtensionMethods.MasalarıYükle();
+                Veriler.Kategoriler.Kategori = ExtensionMethods.KategorileriYükle();
+                Veriler.Müşteriler.Müşteri = ExtensionMethods.MüşterileriYükle();
+            }
         }
     }
 }

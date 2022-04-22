@@ -74,6 +74,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\MultiplyConverter.cs" />
     <Compile Include="Converter\BooltoVisibilityConverter.cs" />
     <Compile Include="Converter\FilePathMergeConverter.cs" />
     <Compile Include="Converter\SiparişSumConverter.cs" />
@@ -81,8 +82,11 @@
     <Compile Include="FişView.xaml.cs">
       <DependentUpon>FişView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\BaseModel.cs" />
     <Compile Include="Model\Kategori.cs" />
     <Compile Include="Model\Kategoriler.cs" />
+    <Compile Include="Model\Müşteri.cs" />
+    <Compile Include="Model\Müşteriler.cs" />
     <Compile Include="Model\Salonlar.cs" />
     <Compile Include="Model\Veriler.cs" />
     <Compile Include="Model\Masa.cs" />
@@ -95,6 +99,8 @@
     <Compile Include="Model\Ürünler.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\MainViewModelBase.cs" />
+    <Compile Include="ViewModel\MüşteriSatışViewModel.cs" />
     <Compile Include="VirtualizingTilePanel.cs" />
     <Page Include="FişView.xaml">
       <SubType>Designer</SubType>

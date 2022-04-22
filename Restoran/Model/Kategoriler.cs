@@ -1,14 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Kategoriler")]
-    public class Kategoriler : INotifyPropertyChanged
+    public class Kategoriler : BaseModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         [XmlElement(ElementName = "Kategori")]
         public ObservableCollection<Kategori> Kategori { get; set; }
     }

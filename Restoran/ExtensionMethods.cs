@@ -181,6 +181,15 @@ namespace Restoran
                            : new Kategoriler();
         }
 
+        internal static ObservableCollection<Kategori> KategorileriYükle()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                   ? null
+                   : File.Exists(MainViewModel.xmldatapath)
+                   ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler.Kategori
+                   : new ObservableCollection<Kategori>();
+        }
+
         internal static ObservableCollection<Masalar> MasalarıYükle()
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
@@ -188,6 +197,24 @@ namespace Restoran
            : File.Exists(MainViewModel.xmldatapath)
            ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Salonlar.Masalar
            : new ObservableCollection<Masalar>();
+        }
+
+        internal static Müşteriler Müşteriler()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                  ? null
+                  : File.Exists(MainViewModel.xmldatapath)
+                  ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Müşteriler
+                  : new Müşteriler();
+        }
+
+        internal static ObservableCollection<Müşteri> MüşterileriYükle()
+        {
+            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                     ? null
+                     : File.Exists(MainViewModel.xmldatapath)
+                     ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Müşteriler.Müşteri
+                     : new ObservableCollection<Müşteri>();
         }
 
         internal static string RandomColor()
@@ -242,15 +269,6 @@ namespace Restoran
                      : File.Exists(MainViewModel.xmldatapath)
                      ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Ürünler.Ürün
                      : new ObservableCollection<Ürün>();
-        }
-
-        internal static ObservableCollection<Kategori> KategorileriYükle()
-        {
-            return DesignerProperties.GetIsInDesignMode(new DependencyObject())
-                   ? null
-                   : File.Exists(MainViewModel.xmldatapath)
-                   ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler.Kategori
-                   : new ObservableCollection<Kategori>();
         }
     }
 }

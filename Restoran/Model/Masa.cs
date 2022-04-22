@@ -1,22 +1,16 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Masa")]
-    public class Masa : INotifyPropertyChanged
+    public class Masa : BaseModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         [XmlAttribute(AttributeName = "Dolu")]
         public bool Dolu { get; set; }
 
         [XmlAttribute(AttributeName = "Gizli")]
         public bool Gizli { get; set; }
-
-        [XmlAttribute(AttributeName = "Id")]
-        public int Id { get; set; }
 
         [XmlAttribute(AttributeName = "Kapasite")]
         public int Kapasite { get; set; }

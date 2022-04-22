@@ -3,12 +3,9 @@
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Kategori")]
-    public class Kategori
+    public class Kategori : BaseModel
     {
         [XmlAttribute(AttributeName = "Açıklama")]
         public string Açıklama { get; set; }
-
-        [XmlAttribute(AttributeName = "Id")]
-        public int Id { get; set; }
     }
 }

@@ -4,12 +4,11 @@ using System.Windows.Input;
 using System.Xml.Serialization;
 using DotLiquid;
 using HandyControl.Controls;
-using Restoran.ViewModel;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Ürün")]
-    public class Ürün : INotifyPropertyChanged, ILiquidizable, IDataErrorInfo
+    public class Ürün : BaseModel, ILiquidizable, IDataErrorInfo
     {
         public Ürün()
         {
@@ -18,23 +17,19 @@ namespace Restoran.Model
                 if (parameter is Ürün ürün)
                 {
                     ürün.Adet += ürün.İlaveÜrünAdeti;
-                    MainViewModel.DatabaseSave.Execute(null);
                     ürün.İlaveÜrünAdeti = 1;
                 }
             }, parameter => true);
             PropertyChanged += Ürün_PropertyChanged;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         [XmlAttribute(AttributeName = "Açıklama")]
         public string Açıklama { get; set; }
 
-        [XmlAttribute(AttributeName = "Adet")]
-        public int Adet { get; set; }
-
         [XmlAttribute(AttributeName = "AlışFiyat")]
         public double AlışFiyat { get; set; } = 1;
+
+        public string Error => string.Empty;
 
         [XmlAttribute(AttributeName = "Favori")]
         public bool Favori { get; set; }
@@ -42,16 +37,13 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "Fiyat")]
         public double Fiyat { get; set; } = 1;
 
-        [XmlAttribute(AttributeName = "Id")]
-        public int Id { get; set; }   
-        
-        [XmlAttribute(AttributeName = "KategoriId")]
-        public int KategoriId { get; set; }
-
         [XmlIgnore]
         public int İlaveÜrünAdeti { get; set; } = 1;
 
         public ICommand İlaveÜrünEkle { get; }
+
+        [XmlAttribute(AttributeName = "KategoriId")]
+        public int KategoriId { get; set; }
 
         [XmlAttribute(AttributeName = "Mevcut")]
         public bool Mevcut { get; set; }
@@ -65,6 +57,13 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "UyarıAdet")]
         public int UyarıAdet { get; set; } = 50;
 
+        public string this[string columnName] => columnName switch
+        {
+            "AlışFiyat" when AlışFiyat > Fiyat => "Alış Fiyatını Satış Fiyatından Fazla Girmeyin.",
+            "Fiyat" when Fiyat < AlışFiyat => "Satış Fiyatını Alış Fiyatından Az Girmeyin.",
+            _ => null
+        };
+
         public object ToLiquid()
         {
             return new { Adet, Açıklama, Fiyat, Id };
@@ -72,7 +71,7 @@ namespace Restoran.Model
 
         private void Ürün_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is "AlışFiyat" )
+            if (e.PropertyName is "AlışFiyat")
             {
                 if (AlışFiyat > Fiyat)
                 {
@@ -88,15 +87,5 @@ namespace Restoran.Model
                 }
             }
         }
-
-        public string Error => string.Empty;
-
-        public string this[string columnName] => columnName switch
-        {
-            "AlışFiyat" when AlışFiyat > Fiyat => "Alış Fiyatını Satış Fiyatından Fazla Girmeyin.",
-            "Fiyat" when Fiyat < AlışFiyat => "Satış Fiyatını Alış Fiyatından Az Girmeyin.",
-            _ => null
-        };
-
     }
 }

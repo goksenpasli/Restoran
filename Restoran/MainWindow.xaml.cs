@@ -9,6 +9,7 @@ namespace Restoran
     public partial class MainWindow : HandyControl.Controls.Window
     {
         public static CollectionViewSource cvs;
+
         public static CollectionViewSource cvsürün;
 
         public MainWindow()
