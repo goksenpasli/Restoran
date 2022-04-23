@@ -450,10 +450,7 @@
                     </DataGrid>
                 </Grid>
             </hc:TabItem>
-            <hc:TabItem d:DataContext="{d:DesignInstance Type=viewmodel:MüşteriSatışViewModel}" Header="MÜŞTERİ SATIŞ">
-                <hc:TabItem.DataContext>
-                    <viewmodel:MüşteriSatışViewModel />
-                </hc:TabItem.DataContext>
+            <hc:TabItem Header="MÜŞTERİ SATIŞ">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -491,7 +488,7 @@
                                         </Grid.RowDefinitions>
                                         <Button x:Name="BtnÜrün" Grid.Row="1" Height="76"
                                             HorizontalAlignment="Stretch"
-                                            Command="{Binding DataContext.MüşteriSiparişArttır, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                            Command="{Binding DataContext.MüşteriSiparişArttır, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                             CommandParameter="{Binding}"
                                             Style="{hc:StaticResource ButtonPrimary}">
                                             <StackPanel ToolTip="{Binding Açıklama}">
@@ -513,7 +510,7 @@
                     <GroupBox Grid.Column="1" Header="MÜŞTERİ">
                         <StackPanel>
                             <hc:TextBox hc:InfoElement.Placeholder="MÜŞTERİ ADINI YAZIN" hc:InfoElement.Title="MÜŞTERİ ADI"
-                                Text="{Binding Müşteri.Ad, UpdateSourceTrigger=PropertyChanged}" />
+                                Text="{Binding Müşteri.Ad}" />
                             <hc:TextBox hc:InfoElement.Placeholder="MÜŞTERİ SOYADINI YAZIN" hc:InfoElement.Title="MÜŞTERİ SOYADI"
                                 Text="{Binding Müşteri.Soyad, UpdateSourceTrigger=PropertyChanged}" />
                             <hc:TextBox hc:InfoElement.Placeholder="MÜŞTERİ ADRESİNİ YAZIN" hc:InfoElement.Title="MÜŞTERİ ADRESİ"

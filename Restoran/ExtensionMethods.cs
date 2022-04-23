@@ -33,12 +33,12 @@ namespace Restoran
 
         public static double DepoÜrünAdeti(this Veriler veriler, int ürünid)
         {
-            return veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet;
+            return veriler.Ürünler.Ürün.Any() ? veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).Adet : 0;
         }
 
         public static double DepoÜrünEşikAdeti(this Veriler veriler, int ürünid)
         {
-            return veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).UyarıAdet;
+            return veriler.Ürünler.Ürün.Any() ? veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).UyarıAdet : 0;
         }
 
         public static string ResimYükle(this string file, double en, double boy)

@@ -36,11 +36,12 @@ namespace Restoran.ViewModel
                 Kategoriler = ExtensionMethods.Kategoriler(),
                 Müşteriler = ExtensionMethods.Müşteriler()
             };
+            VerileriYükle();
+
             Ürün = new Ürün();
             Kategori = new Kategori();
             Siparişler = new Siparişler();
 
-            VerileriYükle();
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
 
@@ -272,6 +273,74 @@ namespace Restoran.ViewModel
                 }
             }, parameter => SeçiliSipariş is not null);
 
+            Müşteri = new Müşteri();
+
+            MüşteriSiparişEkle = new RelayCommand<object>(parameter =>
+            {
+                if (parameter is Ürün ürün)
+                {
+                    Sipariş sipariş = new()
+                    {
+                        ÜrünId = ürün.Id,
+                        Adet = 1,
+                    };
+
+                    SeçiliMüşteri.Sipariş.Add(sipariş);
+                    DepoKontrol(Veriler.DepoÜrünAdeti(ürün.Id), Veriler.DepoÜrünEşikAdeti(ürün.Id));
+                }
+            }, parameter => !string.IsNullOrWhiteSpace(Müşteri?.Ad) && !string.IsNullOrWhiteSpace(Müşteri?.Soyad) && !string.IsNullOrWhiteSpace(Müşteri?.Adres));
+
+            MüşteriEkle = new RelayCommand<object>(parameter =>
+            {
+                Müşteri müşteri = new()
+                {
+                    Ad = Müşteri.Ad,
+                    Soyad = Müşteri.Soyad,
+                    Adres = Müşteri.Adres,
+                    Id = ExtensionMethods.RandomNumber()
+                };
+
+                Veriler.Müşteriler.Müşteri.Add(müşteri);
+                DatabaseSave.Execute(null);
+                ResetMüşteri();
+            }, parameter => !string.IsNullOrWhiteSpace(Müşteri?.Ad) && !string.IsNullOrWhiteSpace(Müşteri?.Soyad) && !string.IsNullOrWhiteSpace(Müşteri?.Adres));
+
+            MüşteriSiparişArttır = new RelayCommand<object>(parameter =>
+            {
+                if (parameter is Ürün ürün)
+                {
+                    if (SeçiliMüşteri.Sipariş?.Any(z => z.ÜrünId == ürün.Id) == true)
+                    {
+                        SeçiliMüşteri.Sipariş.FirstOrDefault(z => z.ÜrünId == ürün.Id).Adet++;
+                        DepoKontrol(Veriler.DepoÜrünAdeti(ürün.Id), Veriler.DepoÜrünEşikAdeti(ürün.Id));
+                    }
+                    else
+                    {
+                        MüşteriSiparişEkle.Execute(ürün);
+                    }
+                }
+            }, parameter => SeçiliMüşteri is not null);
+
+            MüşteriSeçiliSiparişSil = new RelayCommand<object>(parameter =>
+            {
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Seçili Sipariş Silinsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Sipariş sipariş)
+                {
+                    _ = SeçiliMüşteri?.Sipariş?.Remove(sipariş);
+                    DatabaseSave.Execute(null);
+                }
+            }, parameter => SeçiliMüşteri?.Ödendi == false);
+
+            MüşteriSiparişTamamla = new RelayCommand<object>(parameter =>
+            {
+                if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Müşterinin Siparişi Tahsil Edildi mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
+                {
+                    SeçiliMüşteri.Ödendi = true;
+                    DatabaseSave.Execute(null);
+                    Growl.Success("Sipariş Kaydedildi.");
+                    SeçiliMüşteri = null;
+                }
+            }, parameter => SeçiliMüşteri?.Sipariş?.Any() == true && SeçiliMüşteri?.Ödendi == false);
+
             ÜrünAra = new RelayCommand<object>(parameter => MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.Açıklama.Contains(ÜrünAramaMetin) == true, parameter => true);
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
@@ -334,6 +403,13 @@ namespace Restoran.ViewModel
                 }
                 MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.KategoriId == AramaSeçiliKategori?.Id;
             }
+        }
+
+        private void ResetMüşteri()
+        {
+            Müşteri.Ad = null;
+            Müşteri.Soyad = null;
+            Müşteri.Adres = null;
         }
 
         private void VerileriYükle()
