@@ -82,7 +82,7 @@
     <Compile Include="FişView.xaml.cs">
       <DependentUpon>FişView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\BaseModel.cs" />
+    <Compile Include="Model\Enum.cs" />
     <Compile Include="Model\Kategori.cs" />
     <Compile Include="Model\Kategoriler.cs" />
     <Compile Include="Model\Müşteri.cs" />
@@ -99,6 +99,9 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MainViewModelBase.cs" />
     <Compile Include="VirtualizingTilePanel.cs" />
+    <Compile Include="ÖdemeView.xaml.cs">
+      <DependentUpon>ÖdemeView.xaml</DependentUpon>
+    </Compile>
     <Page Include="FişView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -115,6 +118,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ÖdemeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -148,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="splash.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -9,6 +9,7 @@ using System.Windows.Markup;
 using DotLiquid;
 using HandyControl.Controls;
 using HandyControl.Data;
+using HandyControl.Interactivity;
 using Microsoft.Win32;
 using Restoran.Model;
 using dotTemplate = DotLiquid.Template;
@@ -108,7 +109,8 @@ namespace Restoran.ViewModel
             {
                 if (parameter is Sipariş sipariş)
                 {
-                    _ = Siparişler.Sipariş.Remove(sipariş);
+                    _ = SeçiliSipariş.Sipariş.Remove(sipariş);
+                    SeçiliSipariş.ToplamTutar = SeçiliSipariş.Sipariş.SiparişToplamları();
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
@@ -175,6 +177,7 @@ namespace Restoran.ViewModel
                     DatabaseSave.Execute(null);
                     Growl.Success("Tahsil Edildi.");
                     OnPropertyChanged(nameof(Masalar));
+                    ControlCommands.Close.Execute(null, null);
                 }
             }, parameter => parameter is Siparişler sipariş && sipariş?.Ödendi == false);
 
@@ -273,6 +276,16 @@ namespace Restoran.ViewModel
                 }
             }, parameter => SeçiliSipariş is not null);
 
+            ÖdemeEkranı = new RelayCommand<object>(parameter =>
+            {
+                ÖdemeView ödemeView = new()
+                {
+                    DataContext = SeçiliSipariş
+                };
+                SeçiliSipariş.ToplamTutar = SeçiliSipariş.Sipariş.SiparişToplamları();
+                _ = Dialog.Show(ödemeView);
+            }, parameter => SeçiliSipariş is not null);
+
             Müşteri = new Müşteri();
 
             MüşteriSiparişEkle = new RelayCommand<object>(parameter =>
@@ -318,6 +331,7 @@ namespace Restoran.ViewModel
                     {
                         MüşteriSiparişEkle.Execute(ürün);
                     }
+                    SeçiliMüşteriSiparişToplamı = SeçiliMüşteri.Sipariş.SiparişToplamları();
                 }
             }, parameter => SeçiliMüşteri is not null);
 
@@ -326,6 +340,7 @@ namespace Restoran.ViewModel
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Seçili Sipariş Silinsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Sipariş sipariş)
                 {
                     _ = SeçiliMüşteri?.Sipariş?.Remove(sipariş);
+                    SeçiliMüşteriSiparişToplamı = SeçiliMüşteri.Sipariş.SiparişToplamları();
                     DatabaseSave.Execute(null);
                 }
             }, parameter => SeçiliMüşteri?.Ödendi == false);
@@ -335,6 +350,8 @@ namespace Restoran.ViewModel
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Müşterinin Siparişi Tahsil Edildi mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
                     SeçiliMüşteri.Ödendi = true;
+                    SeçiliMüşteri.Tarih = DateTime.Now;
+                    SeçiliMüşteri.ToplamTutar = SeçiliMüşteriSiparişToplamı;
                     DatabaseSave.Execute(null);
                     Growl.Success("Sipariş Kaydedildi.");
                     SeçiliMüşteri = null;
@@ -402,6 +419,10 @@ namespace Restoran.ViewModel
                     return;
                 }
                 MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.KategoriId == AramaSeçiliKategori?.Id;
+            }
+            if (e.PropertyName is "SeçiliMüşteri" && SeçiliMüşteri is not null)
+            {
+                SeçiliMüşteriSiparişToplamı = SeçiliMüşteri.Sipariş.SiparişToplamları();
             }
         }
 

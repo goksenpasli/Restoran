@@ -8,7 +8,7 @@ using HandyControl.Controls;
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Ürün")]
-    public class Ürün : BaseModel, ILiquidizable, IDataErrorInfo
+    public class Ürün : INotifyPropertyChanged, ILiquidizable, IDataErrorInfo
     {
         public Ürün()
         {
@@ -23,8 +23,13 @@ namespace Restoran.Model
             PropertyChanged += Ürün_PropertyChanged;
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         [XmlAttribute(AttributeName = "Açıklama")]
         public string Açıklama { get; set; }
+
+        [XmlAttribute(AttributeName = "Adet")]
+        public int Adet { get; set; }
 
         [XmlAttribute(AttributeName = "AlışFiyat")]
         public double AlışFiyat { get; set; } = 1;
@@ -36,6 +41,9 @@ namespace Restoran.Model
 
         [XmlAttribute(AttributeName = "Fiyat")]
         public double Fiyat { get; set; } = 1;
+
+        [XmlAttribute(AttributeName = "Id")]
+        public int Id { get; set; }
 
         [XmlIgnore]
         public int İlaveÜrünAdeti { get; set; } = 1;

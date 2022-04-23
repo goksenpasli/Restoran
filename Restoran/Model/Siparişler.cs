@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Xml.Serialization;
 using PropertyChanged;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Siparişler")]
-    public class Siparişler : BaseModel
+    public class Siparişler : INotifyPropertyChanged
     {
         private double farkDakika;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         [XmlIgnore]
         [DependsOn("TahsilatTarih", "Tarih")]
@@ -18,6 +21,12 @@ namespace Restoran.Model
 
             set => farkDakika = value;
         }
+
+        [XmlAttribute(AttributeName = "Id")]
+        public int Id { get; set; }
+
+        [XmlAttribute(AttributeName = "Ödendi")]
+        public bool Ödendi { get; set; }
 
         [XmlElement(ElementName = "Sipariş")]
         public ObservableCollection<Sipariş> Sipariş { get; set; } = new();

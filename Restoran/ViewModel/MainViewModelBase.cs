@@ -67,6 +67,8 @@ namespace Restoran.ViewModel
 
         public ICommand MüşteriSiparişTamamla { get; set; }
 
+        public ICommand ÖdemeEkranı { get; set; }
+
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
 
         public string SalonAdı { get; set; }
@@ -76,6 +78,8 @@ namespace Restoran.ViewModel
         public Kategori SeçiliKategori { get; set; }
 
         public Müşteri SeçiliMüşteri { get; set; }
+
+        public double SeçiliMüşteriSiparişToplamı { get; set; }
 
         public double SeçiliSalonGünlükSiparişToplamı { get; set; }
 

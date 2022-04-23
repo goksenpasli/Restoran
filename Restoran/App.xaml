@@ -5,9 +5,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:Restoran"
              xmlns:Converter="clr-namespace:Restoran.Converter"
+             xmlns:model="clr-namespace:Restoran.Model"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:hc="https://handyorg.github.io/handycontrol"
-             StartupUri="MainWindow.xaml"
-    mc:Ignorable="d">
+             StartupUri="MainWindow.xaml" mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -20,6 +21,12 @@
             <hc:Boolean2BooleanReConverter x:Key="Boolean2BooleanReConverter" />
             <Converter:FilePathMergeConverter x:Key="FilePathMergeConverter" />
             <Converter:SiparişSumConverter x:Key="SiparişSumConverter" />
+            <ObjectDataProvider x:Key="ÖdemeŞekilleri" MethodName="GetValues"
+                ObjectType="{x:Type System:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="model:ÖdemeŞekli" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
             <DrawingBrush x:Key="StatisticDrawing">
                 <DrawingBrush.Drawing>
                     <DrawingGroup>
@@ -234,6 +241,17 @@
                     </ListBox.ItemsPanel>
                 </ListBox>
             </DataTemplate>
+            <DataTemplate x:Key="ComboBoxSiparişItemTemplate">
+                <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold">
+                    <Run Text="{Binding Açıklama}" />
+                    <Run>
+                        <MultiBinding Converter="{StaticResource MultiplyConverter}" StringFormat="{}{0:C}">
+                            <Binding Path="Fiyat" />
+                            <Binding ElementName="NumericAdet" Path="Value" />
+                        </MultiBinding>
+                    </Run>
+                </TextBlock>
+            </DataTemplate>
             <DataTemplate x:Key="SiparişItemTemplate">
                 <StackPanel Orientation="Horizontal">
                     <hc:NumericUpDown x:Name="NumericAdet" IsReadOnly="False" Minimum="1"
@@ -241,31 +259,26 @@
                         ValueFormat="0 Adet"
                         Value="{Binding Adet}" />
                     <ComboBox d:Width="55" IsEnabled="False"
+                        ItemTemplate="{StaticResource ComboBoxSiparişItemTemplate}"
                         ItemsSource="{Binding DataContext.Veriler.Ürünler.Ürün, RelativeSource={RelativeSource AncestorType=Window}}"
                         SelectedValue="{Binding ÜrünId}"
                         SelectedValuePath="Id"
-                        Template="{StaticResource ComboBoxSimpleTemplate}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold">
-                                    <Run Text="{Binding Açıklama}" />
-                                    <Run>
-                                        <Run.Text>
-                                            <MultiBinding Converter="{StaticResource MultiplyConverter}" StringFormat="{}{0:C}">
-                                                <Binding Path="Fiyat" />
-                                                <Binding ElementName="NumericAdet" Path="Value" />
-                                            </MultiBinding>
-                                        </Run.Text>
-                                    </Run>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                        Template="{StaticResource ComboBoxSimpleTemplate}" />
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="ListBoxSiparişItemTemplate">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource SiparişItemTemplate}" />
+                    <Button Command="{Binding DataContext.SeçiliSiparişSil, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding Mode=OneWay}"
+                        Content="SİL"
+                        Style="{hc:StaticResource ButtonDanger}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="ListBoxSiparişTahsilatItemTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource SiparişItemTemplate}" />
+                    <hc:ComboBox ItemsSource="{Binding Source={StaticResource ÖdemeŞekilleri}}" SelectedItem="{Binding ÖdemeŞekli}" />
                     <Button Command="{Binding DataContext.SeçiliSiparişSil, RelativeSource={RelativeSource AncestorType=Window}}"
                         CommandParameter="{Binding Mode=OneWay}"
                         Content="SİL"
@@ -283,26 +296,11 @@
                                         ValueFormat="0 Adet"
                                         Value="{Binding Adet}" />
                                     <ComboBox d:Width="55" IsEnabled="False"
-                                        ItemsSource="{Binding DataContext.Veriler.Ürünler.Ürün, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        ItemTemplate="{StaticResource ComboBoxSiparişItemTemplate}"
+                                        ItemsSource="{Binding DataContext.Veriler.Ürünler.Ürün, RelativeSource={RelativeSource AncestorType=Window}}"
                                         SelectedValue="{Binding ÜrünId}"
                                         SelectedValuePath="Id"
-                                        Template="{StaticResource ComboBoxSimpleTemplate}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Bold">
-                                                    <Run Text="{Binding Açıklama}" />
-                                                    <Run>
-                                                        <Run.Text>
-                                                            <MultiBinding Converter="{StaticResource MultiplyConverter}" StringFormat="{}{0:C}">
-                                                                <Binding Path="Fiyat" />
-                                                                <Binding ElementName="NumericAdet" Path="Value" />
-                                                            </MultiBinding>
-                                                        </Run.Text>
-                                                    </Run>
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
+                                        Template="{StaticResource ComboBoxSimpleTemplate}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ContentControl.ContentTemplate>
