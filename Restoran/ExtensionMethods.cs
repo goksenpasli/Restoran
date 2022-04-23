@@ -45,7 +45,7 @@ namespace Restoran
         {
             string filename = Guid.NewGuid() + Path.GetExtension(file);
             BitmapImage image = new(new Uri(file));
-            File.WriteAllBytes($"{Path.GetDirectoryName(MainViewModel.xmldatapath)}\\{filename}", image.Resize(en, boy).ToTiffJpegByteArray(Format.Jpg));
+            File.WriteAllBytes($"{Path.GetDirectoryName(MainViewModelBase.xmldatapath)}\\{filename}", image.Resize(en, boy).ToTiffJpegByteArray(Format.Jpg));
             return filename;
         }
 
@@ -176,8 +176,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                            ? null
-                           : File.Exists(MainViewModel.xmldatapath)
-                           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler
+                           : File.Exists(MainViewModelBase.xmldatapath)
+                           ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Kategoriler
                            : new Kategoriler();
         }
 
@@ -185,8 +185,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                    ? null
-                   : File.Exists(MainViewModel.xmldatapath)
-                   ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Kategoriler.Kategori
+                   : File.Exists(MainViewModelBase.xmldatapath)
+                   ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Kategoriler.Kategori
                    : new ObservableCollection<Kategori>();
         }
 
@@ -194,8 +194,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
            ? null
-           : File.Exists(MainViewModel.xmldatapath)
-           ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Salonlar.Masalar
+           : File.Exists(MainViewModelBase.xmldatapath)
+           ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Salonlar.Masalar
            : new ObservableCollection<Masalar>();
         }
 
@@ -203,8 +203,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                   ? null
-                  : File.Exists(MainViewModel.xmldatapath)
-                  ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Müşteriler
+                  : File.Exists(MainViewModelBase.xmldatapath)
+                  ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Müşteriler
                   : new Müşteriler();
         }
 
@@ -212,8 +212,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                      ? null
-                     : File.Exists(MainViewModel.xmldatapath)
-                     ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Müşteriler.Müşteri
+                     : File.Exists(MainViewModelBase.xmldatapath)
+                     ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Müşteriler.Müşteri
                      : new ObservableCollection<Müşteri>();
         }
 
@@ -231,15 +231,15 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                     ? null
-                    : File.Exists(MainViewModel.xmldatapath)
-                    ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Salonlar
+                    : File.Exists(MainViewModelBase.xmldatapath)
+                    ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Salonlar
                     : new Salonlar();
         }
 
         internal static void Serialize<T>(this T dataToSerialize) where T : class
         {
             XmlSerializer serializer = new(typeof(T));
-            using TextWriter stream = new StreamWriter(MainViewModel.xmldatapath);
+            using TextWriter stream = new StreamWriter(MainViewModelBase.xmldatapath);
             serializer.Serialize(stream, dataToSerialize);
         }
 
@@ -257,8 +257,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                     ? null
-                    : File.Exists(MainViewModel.xmldatapath)
-                    ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Ürünler
+                    : File.Exists(MainViewModelBase.xmldatapath)
+                    ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Ürünler
                     : new Ürünler();
         }
 
@@ -266,8 +266,8 @@ namespace Restoran
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())
                      ? null
-                     : File.Exists(MainViewModel.xmldatapath)
-                     ? MainViewModel.xmldatapath.DeSerialize<Veriler>().Ürünler.Ürün
+                     : File.Exists(MainViewModelBase.xmldatapath)
+                     ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Ürünler.Ürün
                      : new ObservableCollection<Ürün>();
         }
     }

@@ -124,7 +124,7 @@
                                                         <hc:NumericUpDown DecimalPlaces="2" FontSize="16" FontWeight="Bold"
                                                             IsReadOnly="True"
                                                             Style="{hc:StaticResource NumericUpDownExtend}"
-                                                            ValueFormat="C"
+                                                            ValueFormat="C2"
                                                             Value="{Binding ToplamTutar}" />
                                                     </CheckBox>
                                                     <Button Command="{Binding DataContext.ÖdemeEkranı, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -267,13 +267,13 @@
                                     Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                                    ValueFormat="C"
+                                    ValueFormat="C2"
                                     Value="{Binding Ürün.AlışFiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
                                     Minimum="1"
                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                     Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                                    ValueFormat="C"
+                                    ValueFormat="C2"
                                     Value="{Binding Ürün.Fiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
                                     Minimum="1"
@@ -320,7 +320,7 @@
                                                 <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
                                                     Minimum="1"
                                                     Style="{hc:StaticResource NumericUpDownExtend}"
-                                                    ValueFormat="C"
+                                                    ValueFormat="C2"
                                                     Value="{Binding Fiyat, UpdateSourceTrigger=PropertyChanged}" />
                                                 <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
                                                     IsReadOnly="True" Minimum="0"

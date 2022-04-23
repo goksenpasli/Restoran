@@ -69,6 +69,8 @@ namespace Restoran.ViewModel
 
         public ICommand ÖdemeEkranı { get; set; }
 
+        public ÖdemeViewModel ÖdemeViewModel { get; set; }
+
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
 
         public string SalonAdı { get; set; }

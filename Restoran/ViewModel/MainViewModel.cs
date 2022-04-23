@@ -42,6 +42,7 @@ namespace Restoran.ViewModel
             Ürün = new Ürün();
             Kategori = new Kategori();
             Siparişler = new Siparişler();
+            ÖdemeViewModel = new ÖdemeViewModel();
 
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
@@ -109,8 +110,8 @@ namespace Restoran.ViewModel
             {
                 if (parameter is Sipariş sipariş)
                 {
-                    _ = SeçiliSipariş.Sipariş.Remove(sipariş);
-                    SeçiliSipariş.ToplamTutar = SeçiliSipariş.Sipariş.SiparişToplamları();
+                    _ = SeçiliSipariş?.Sipariş?.Remove(sipariş);
+                    SeçiliSipariş.ToplamTutar = SeçiliSipariş?.Sipariş?.SiparişToplamları() ?? 0;
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
@@ -278,12 +279,9 @@ namespace Restoran.ViewModel
 
             ÖdemeEkranı = new RelayCommand<object>(parameter =>
             {
-                ÖdemeView ödemeView = new()
-                {
-                    DataContext = SeçiliSipariş
-                };
-                SeçiliSipariş.ToplamTutar = SeçiliSipariş.Sipariş.SiparişToplamları();
-                _ = Dialog.Show(ödemeView);
+                SeçiliSipariş.ToplamTutar = SeçiliSipariş?.Sipariş?.SiparişToplamları() ?? 0;
+                ÖdemeViewModel.Siparişler = SeçiliSipariş;
+                _ = Dialog.Show(ÖdemeViewModel);
             }, parameter => SeçiliSipariş is not null);
 
             Müşteri = new Müşteri();
