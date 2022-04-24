@@ -43,6 +43,7 @@ namespace Restoran.ViewModel
             Kategori = new Kategori();
             Siparişler = new Siparişler();
             ÖdemeViewModel = new ÖdemeViewModel();
+            FişViewModel = new FişViewModel();
 
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
@@ -170,7 +171,6 @@ namespace Restoran.ViewModel
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Tahsilatı Onaylıyor musun?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes && parameter is Siparişler siparişler)
                 {
                     siparişler.Ödendi = true;
-                    siparişler.ToplamTutar = siparişler.Sipariş.SiparişToplamları();
                     siparişler.TahsilatTarih = DateTime.Now;
                     Masalar.SeçiliMasa.Dolu = false;
                     ExtensionMethods.ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
@@ -270,16 +270,17 @@ namespace Restoran.ViewModel
                 if (File.Exists("Report\\report.lqd"))
                 {
                     string template = GenerateTemplate("Report\\report.lqd");
-                    FişView fiş = new();
                     FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
-                    fiş.DocViewer.Document = fd.WriteXPS();
-                    _ = Dialog.Show(fiş);
+                    FişViewModel.Document = fd.WriteXPS();
+                    _ = Dialog.Show(FişViewModel);
                 }
             }, parameter => SeçiliSipariş is not null);
 
             ÖdemeEkranı = new RelayCommand<object>(parameter =>
             {
                 SeçiliSipariş.ToplamTutar = SeçiliSipariş?.Sipariş?.SiparişToplamları() ?? 0;
+                ÖdemeViewModel.GeriVerilecek = 0;
+                ÖdemeViewModel.Siparişler = null;
                 ÖdemeViewModel.Siparişler = SeçiliSipariş;
                 _ = Dialog.Show(ÖdemeViewModel);
             }, parameter => SeçiliSipariş is not null);

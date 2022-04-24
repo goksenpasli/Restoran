@@ -27,6 +27,8 @@ namespace Restoran.ViewModel
 
         public ICommand FişEkranı { get; set; }
 
+        public FişViewModel FişViewModel { get; set; }
+
         public ICommand İlaveÜrünEkle { get; set; }
 
         public Kategori Kategori { get; set; }

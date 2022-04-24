@@ -4,14 +4,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:local="clr-namespace:Restoran"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="clr-namespace:Restoran.Model" Width="400" Height="300"
+    xmlns:model="clr-namespace:Restoran.Model" Width="720" Height="480"
     d:DataContext="{d:DesignInstance Type=ViewModel:ÖdemeViewModel}"
     Background="{DynamicResource RegionBrush}"
     CornerRadius="10" UseLayoutRounding="True" mc:Ignorable="d">
     <Grid Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="272.8" />
             <RowDefinition />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -34,16 +38,82 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
-        <TextBlock Grid.Row="1" d:Text="ToplamTutar" FontSize="16"
-            FontWeight="Bold" Foreground="Red"
-            Text="{Binding Siparişler.ToplamTutar, StringFormat=TOPLAM \{0:C\}}" />
-        <Button Grid.Row="2" HorizontalAlignment="Stretch"
+        <StackPanel Grid.Row="1">
+            <TextBlock d:Text="ToplamTutar" FontSize="24" FontWeight="Bold"
+                Foreground="Red"
+                Text="{Binding Siparişler.ToplamTutar, StringFormat=TOPLAM \{0:C\}}" />
+            <TextBlock d:Text="GeriVerilecek" FontSize="24" FontWeight="Bold"
+                Foreground="Green"
+                Text="{Binding GeriVerilecek, StringFormat=GERİ VERİLECEK \{0:C\}}" />
+        </StackPanel>
+        <Button Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
             Command="{Binding DataContext.SiparişTahsilEt, RelativeSource={RelativeSource AncestorType=Window}}"
             CommandParameter="{Binding Siparişler}"
             Content="TAHSİL ET"
             Style="{hc:StaticResource ButtonSuccess}" />
-        <Button Grid.Row="3" HorizontalAlignment="Stretch" Command="hc:ControlCommands.Close"
-            Content="KAPAT"
+        <Button Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            Command="hc:ControlCommands.Close" Content="KAPAT"
             Style="{hc:StaticResource ButtonWarning}" />
+        <GroupBox Grid.Column="1" Header="AYRINTI">
+            <StackPanel>
+                <CheckBox IsChecked="{Binding SeçiliSipariş.İndirimSeçili}" IsEnabled="{Binding SeçiliSipariş, Converter={StaticResource Object2BooleanConverter}}">
+                    <StackPanel IsEnabled="{Binding SeçiliSipariş.İndirimSeçili}" Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="İNDİRİM&#x0a;YAP" />
+                        <hc:NumericUpDown Minimum="0"
+                            Style="{hc:StaticResource NumericUpDownExtend}"
+                            ValueFormat="C2"
+                            Value="{Binding SeçiliSipariş.İndirimliFiyat}" />
+                        <hc:ButtonGroup Orientation="Vertical">
+                            <Button Command="{Binding İndirimUygula}"
+                                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                                Content="%10 İndirim" Tag="10" />
+                            <Button Command="{Binding İndirimUygula}"
+                                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                                Content="%20 İndirim" Tag="20" />
+                        </hc:ButtonGroup>
+                    </StackPanel>
+                </CheckBox>
+            </StackPanel>
+        </GroupBox>
+        <UniformGrid Grid.Row="1" Grid.Column="2" Columns="3"
+            Rows="2">
+            <UniformGrid.Resources>
+                <Style BasedOn="{hc:StaticResource ButtonCustom}" TargetType="Button">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+            </UniformGrid.Resources>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="200">
+                <Image Source="/Resources/200.jpg" />
+            </Button>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="100">
+                <Image Source="/Resources/100.jpg" />
+            </Button>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="50">
+                <Image Source="/Resources/50.jpg" />
+            </Button>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="20">
+                <Image Source="/Resources/20.jpg" />
+            </Button>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="10">
+                <Image Source="/Resources/10.jpg" />
+            </Button>
+            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
+                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                Tag="5">
+                <Image Source="/Resources/5.jpg" />
+            </Button>
+
+        </UniformGrid>
+
     </Grid>
 </Border>

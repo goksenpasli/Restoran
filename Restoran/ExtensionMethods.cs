@@ -261,7 +261,10 @@ namespace Restoran
                     ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Ürünler
                     : new Ürünler();
         }
-
+        public static double FiyatHesapla(this Sipariş sipariş)
+        {
+            return ExtensionMethods.ÜrünleriYükle().FirstOrDefault(x => x.Id == sipariş.ÜrünId).Fiyat * sipariş.Adet;
+        }
         internal static ObservableCollection<Ürün> ÜrünleriYükle()
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())

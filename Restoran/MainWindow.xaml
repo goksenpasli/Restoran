@@ -374,10 +374,13 @@
                                     Content="KATEGORİ KAYDET"
                                     Style="{hc:StaticResource ButtonDanger}" />
                                 <GroupBox Height="250" Header="KATEGORİLER">
-                                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" ItemsSource="{Binding Veriler.Kategoriler.Kategori}">
+                                    <ListBox HorizontalContentAlignment="Stretch"
+                                        d:ItemsSource="{d:SampleData ItemCount=5}"
+                                        ItemsSource="{Binding Veriler.Kategoriler.Kategori}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <Button Command="{Binding DataContext.KategoriSil, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                <Button HorizontalAlignment="Stretch"
+                                                    Command="{Binding DataContext.KategoriSil, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     Content="{Binding Açıklama}"
                                                     Style="{hc:StaticResource ButtonDanger}" />

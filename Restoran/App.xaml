@@ -19,10 +19,14 @@
             <Converter:BooltoVisibilityConverter x:Key="BooltoVisibilityConverter" />
             <Converter:MultiplyConverter x:Key="MultiplyConverter" />
             <hc:Boolean2BooleanReConverter x:Key="Boolean2BooleanReConverter" />
+            <hc:Object2BooleanConverter x:Key="Object2BooleanConverter" />
             <Converter:FilePathMergeConverter x:Key="FilePathMergeConverter" />
             <Converter:SiparişSumConverter x:Key="SiparişSumConverter" />
             <DataTemplate DataType="{x:Type ViewModel:ÖdemeViewModel}">
                 <local:ÖdemeView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type ViewModel:FişViewModel}">
+                <local:FişView />
             </DataTemplate>
             <ObjectDataProvider x:Key="ÖdemeŞekilleri" MethodName="GetValues"
                 ObjectType="{x:Type System:Enum}">
