@@ -38,20 +38,42 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
-        <StackPanel Grid.Row="1">
-            <TextBlock d:Text="ToplamTutar" FontSize="24" FontWeight="Bold"
-                Foreground="Red"
+        <Grid Grid.Row="1" Grid.RowSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" d:Text="ToplamTutar" FontSize="24"
+                FontWeight="Bold" Foreground="Red"
                 Text="{Binding Siparişler.ToplamTutar, StringFormat=TOPLAM \{0:C\}}" />
-            <TextBlock d:Text="GeriVerilecek" FontSize="24" FontWeight="Bold"
-                Foreground="Green"
+            <TextBlock Grid.Row="1" d:Text="GeriVerilecek" FontSize="24"
+                FontWeight="Bold" Foreground="Green"
                 Text="{Binding GeriVerilecek, StringFormat=GERİ VERİLECEK \{0:C\}}" />
-        </StackPanel>
-        <Button Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+            <ListView Grid.Row="2"
+                DataContext="{DynamicResource Döviz}"
+                ItemsSource="{Binding XPath=/Tarih_Date/Currency}">
+                <ListView.Resources>
+                    <XmlDataProvider x:Key="Döviz" IsAsynchronous="True" IsInitialLoadEnabled="True"
+                        Source="http://www.tcmb.gov.tr/kurlar/today.xml" />
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="150"
+                            DisplayMemberBinding="{Binding XPath=Isim}"
+                            Header="DÖVİZ" />
+                        <GridViewColumn DisplayMemberBinding="{Binding XPath=BanknoteBuying}" Header="ALIŞ" />
+                        <GridViewColumn DisplayMemberBinding="{Binding XPath=BanknoteSelling}" Header="SATIŞ" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Button Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch"
             Command="{Binding DataContext.SiparişTahsilEt, RelativeSource={RelativeSource AncestorType=Window}}"
             CommandParameter="{Binding Siparişler}"
             Content="TAHSİL ET"
             Style="{hc:StaticResource ButtonSuccess}" />
-        <Button Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+        <Button Grid.Row="5" Grid.Column="2" HorizontalAlignment="Stretch"
             Command="hc:ControlCommands.Close" Content="KAPAT"
             Style="{hc:StaticResource ButtonWarning}" />
         <GroupBox Grid.Column="1" Header="AYRINTI">
@@ -75,45 +97,38 @@
                 </CheckBox>
             </StackPanel>
         </GroupBox>
-        <UniformGrid Grid.Row="1" Grid.Column="2" Columns="3"
-            Rows="2">
-            <UniformGrid.Resources>
-                <Style BasedOn="{hc:StaticResource ButtonCustom}" TargetType="Button">
-                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <ListBox Grid.Row="1" Grid.Column="1"
+            SelectedValue="{Binding SeçiliPara}"
+            SelectedValuePath="Tag">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
-            </UniformGrid.Resources>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="200">
-                <Image Source="/Resources/200.jpg" />
-            </Button>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="100">
-                <Image Source="/Resources/100.jpg" />
-            </Button>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="50">
-                <Image Source="/Resources/50.jpg" />
-            </Button>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="20">
-                <Image Source="/Resources/20.jpg" />
-            </Button>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="10">
-                <Image Source="/Resources/10.jpg" />
-            </Button>
-            <Button Command="{Binding GeriVerilecekTutarıHesapla}"
-                CommandParameter="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
-                Tag="5">
-                <Image Source="/Resources/5.jpg" />
-            </Button>
-
-        </UniformGrid>
-
+            </ListBox.ItemContainerStyle>
+            <ListBoxItem Tag="200">
+                <Image Source="/Resources/200.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBoxItem Tag="100">
+                <Image Source="/Resources/100.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBoxItem Tag="50">
+                <Image Source="/Resources/50.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBoxItem Tag="20">
+                <Image Source="/Resources/20.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBoxItem Tag="10">
+                <Image Source="/Resources/10.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBoxItem Tag="5">
+                <Image Source="/Resources/5.jpg" Stretch="Fill" />
+            </ListBoxItem>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="3" Rows="2" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
     </Grid>
 </Border>

@@ -1,0 +1,58 @@
+<FlowDocument ColumnWidth="21cm"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:sys="clr-namespace:System;assembly=mscorlib"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontFamily="Segoe UI">
+	<Paragraph Margin="0" FontSize="24" TextAlignment="Center" Foreground="Black">
+		RAPOR
+	</Paragraph>
+	<Paragraph Margin="0" FontSize="16">
+		<Run Foreground="Black" Text="{Binding Mode=OneWay, Source={x:Static sys:DateTime.Now}}" />
+	</Paragraph>
+	<Table  CellSpacing="0">
+		<TableRowGroup>
+			<TableRow  Background="Gainsboro" FontWeight="Bold">
+				<TableCell>
+					<Paragraph TextAlignment="Center">
+						Sipariş Tarih
+					</Paragraph>
+				</TableCell>
+				<TableCell>
+					<Paragraph TextAlignment="Center">
+						Tahsilat Tarih
+					</Paragraph>
+				</TableCell>
+				<TableCell>
+					<Paragraph TextAlignment="Center">
+						Toplam
+					</Paragraph>
+				</TableCell>
+			</TableRow>
+		</TableRowGroup>
+
+		{% for sipariş in Siparişler -%}
+		<TableRowGroup>
+			<TableRow>
+				<TableCell>
+					<Paragraph TextAlignment="Center">
+						<Run Text="{{ sipariş.Tarih}}" Foreground="Black"/>
+					</Paragraph>
+				</TableCell>
+				<TableCell>
+					<Paragraph TextAlignment="Center">
+						{% if sipariş.TahsilatTarih == "01.01.0001" %}
+						<Run Text="Henüz Tahsil Edilmedi" Foreground="Red"/>	
+						{% else %}
+						<Run Text="{{ sipariş.TahsilatTarih}}" Foreground="Black"/>
+						{% endif %}
+					</Paragraph>
+				</TableCell>
+				<TableCell>
+					<Paragraph  TextAlignment="Center">
+						<Run  Text="{{ sipariş.ToplamTutar |currency:c}}" Foreground="Red"/>
+					</Paragraph>
+				</TableCell>
+			</TableRow>
+		</TableRowGroup>
+		{% endfor -%}
+	</Table>
+</FlowDocument>

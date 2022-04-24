@@ -244,6 +244,12 @@
                             <TextBlock d:Text="SeçiliSalonGünlükSiparişToplamı" Foreground="White"
                                 Text="{Binding SeçiliSalonGünlükSiparişToplamı, StringFormat=Seçili Salon Günlük Toplam \{0:C\}}" />
                         </StatusBarItem>
+                        <DatePicker SelectedDate="{Binding RaporSeçiliGün}" />
+                        <TextBlock>
+                            <Hyperlink Command="{Binding GünlükRaporEkranı}">
+                                <Run Text="RAPOR AL" />
+                            </Hyperlink>
+                        </TextBlock>
                     </StatusBar>
                 </Grid>
             </hc:TabItem>
@@ -256,50 +262,54 @@
                     </Grid.ColumnDefinitions>
                     <hc:TransitioningContentControl TransitionMode="Bottom2Top">
                         <GroupBox Header="ÜRÜN GİRİŞİ">
-                            <StackPanel>
-                                <hc:TextBox hc:InfoElement.Placeholder="ÜRÜN ADINI YAZIN" hc:InfoElement.Title="ÜRÜN ADI"
-                                    Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
-                                <hc:ComboBox hc:InfoElement.Placeholder="KATEGORİ SEÇİN" hc:InfoElement.Title="KATEGORİ"
-                                    DisplayMemberPath="Açıklama"
-                                    ItemsSource="{Binding Veriler.Kategoriler.Kategori}"
-                                    SelectedItem="{Binding SeçiliKategori}" />
-                                <hc:NumericUpDown hc:InfoElement.Title="ALIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
-                                    Minimum="1"
-                                    Style="{hc:StaticResource NumericUpDownExtend}"
-                                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                                    ValueFormat="C2"
-                                    Value="{Binding Ürün.AlışFiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
-                                    Minimum="1"
-                                    Style="{hc:StaticResource NumericUpDownExtend}"
-                                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                                    ValueFormat="C2"
-                                    Value="{Binding Ürün.Fiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
-                                    Minimum="1"
-                                    Style="{hc:StaticResource NumericUpDownExtend}"
-                                    Value="{Binding Ürün.Adet, UpdateSourceTrigger=PropertyChanged}" />
-                                <hc:NumericUpDown hc:InfoElement.Title="UYARI ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
-                                    Minimum="1"
-                                    Style="{hc:StaticResource NumericUpDownExtend}"
-                                    ToolTip="Bu Adetten Aşağı Ürün Kalırsa Uyarı Ver"
-                                    Value="{Binding Ürün.UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="FAVORİ" IsChecked="{Binding Ürün.Favori}" />
-                                <HeaderedContentControl Header="ÜRÜN RESİM">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <hc:TextBox hc:InfoElement.Placeholder="ÜRÜN ADINI YAZIN" hc:InfoElement.Title="ÜRÜN ADI"
+                                        Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:TextBox hc:InfoElement.Placeholder="ÜRÜN BARKODU YAZIN" hc:InfoElement.Title="ÜRÜN BARKOD"
+                                        Text="{Binding Ürün.Barkod, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:ComboBox hc:InfoElement.Placeholder="KATEGORİ SEÇİN" hc:InfoElement.Title="KATEGORİ"
+                                        DisplayMemberPath="Açıklama"
+                                        ItemsSource="{Binding Veriler.Kategoriler.Kategori}"
+                                        SelectedItem="{Binding SeçiliKategori}" />
+                                    <hc:NumericUpDown hc:InfoElement.Title="ALIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                        Minimum="1"
+                                        Style="{hc:StaticResource NumericUpDownExtend}"
+                                        Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                                        ValueFormat="C2"
+                                        Value="{Binding Ürün.AlışFiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:NumericUpDown hc:InfoElement.Title="SATIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
+                                        Minimum="1"
+                                        Style="{hc:StaticResource NumericUpDownExtend}"
+                                        Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                                        ValueFormat="C2"
+                                        Value="{Binding Ürün.Fiyat, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:NumericUpDown hc:InfoElement.Title="ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                        Minimum="1"
+                                        Style="{hc:StaticResource NumericUpDownExtend}"
+                                        Value="{Binding Ürün.Adet, UpdateSourceTrigger=PropertyChanged}" />
+                                    <hc:NumericUpDown hc:InfoElement.Title="UYARI ADET" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="0"
+                                        Minimum="1"
+                                        Style="{hc:StaticResource NumericUpDownExtend}"
+                                        ToolTip="Bu Adetten Aşağı Ürün Kalırsa Uyarı Ver"
+                                        Value="{Binding Ürün.UyarıAdet, UpdateSourceTrigger=PropertyChanged}" />
+                                    <CheckBox Content="FAVORİ" IsChecked="{Binding Ürün.Favori}" />
+                                    <HeaderedContentControl Header="ÜRÜN RESİM">
+                                        <Button HorizontalAlignment="Stretch"
+                                            Command="{Binding ÜrünResimYükle}"
+                                            Content="RESİM YÜKLE"
+                                            Style="{hc:StaticResource ButtonDanger}" />
+                                    </HeaderedContentControl>
+                                    <GroupBox Header="RESİM">
+                                        <Image Width="64" Height="64"
+                                            Source="{Binding Ürün.Resim, Converter={StaticResource FilePathMergeConverter}}" />
+                                    </GroupBox>
                                     <Button HorizontalAlignment="Stretch"
-                                        Command="{Binding ÜrünResimYükle}"
-                                        Content="RESİM YÜKLE"
+                                        Command="{Binding ÜrünKaydet}"
+                                        Content="GİRİŞ YAP"
                                         Style="{hc:StaticResource ButtonDanger}" />
-                                </HeaderedContentControl>
-                                <GroupBox Header="RESİM">
-                                    <Image Width="64" Height="64"
-                                        Source="{Binding Ürün.Resim, Converter={StaticResource FilePathMergeConverter}}" />
-                                </GroupBox>
-                                <Button HorizontalAlignment="Stretch"
-                                    Command="{Binding ÜrünKaydet}"
-                                    Content="GİRİŞ YAP"
-                                    Style="{hc:StaticResource ButtonDanger}" />
-                            </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
                         </GroupBox>
                     </hc:TransitioningContentControl>
                     <hc:TransitioningContentControl Grid.Column="1" TransitionMode="Left2Right">
@@ -545,7 +555,15 @@
                                 Style="{hc:StaticResource ButtonDanger}" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Column="2" Header="MÜŞTERİLER">
+                    <GroupBox Grid.Column="2">
+                        <GroupBox.Header>
+                            <hc:SearchBar Width="200" hc:InfoElement.Placeholder="MÜŞERİ ARA" hc:InfoElement.Title="MÜŞTERİ"
+                                hc:InfoElement.TitlePlacement="Left"
+                                Command="{Binding MüşteriAra}"
+                                IsRealTime="True" ShowClearButton="True"
+                                Style="{StaticResource SearchBarPlusBaseStyle}"
+                                Text="{Binding MüşteriAramaMetin, UpdateSourceTrigger=PropertyChanged}" />
+                        </GroupBox.Header>
                         <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
                             IsSynchronizedWithCurrentItem="False"
                             ItemsSource="{Binding Mode=OneWay, Source={StaticResource Müşteriler}}"

@@ -79,8 +79,8 @@
     <Compile Include="Converter\FilePathMergeConverter.cs" />
     <Compile Include="Converter\SiparişSumConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="FişView.xaml.cs">
-      <DependentUpon>FişView.xaml</DependentUpon>
+    <Compile Include="DocumentView.xaml.cs">
+      <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Enum.cs" />
     <Compile Include="Model\Kategori.cs" />
@@ -96,7 +96,7 @@
     <Compile Include="Model\Ürün.cs" />
     <Compile Include="Model\Ürünler.cs" />
     <Compile Include="RelayCommand.cs" />
-    <Compile Include="ViewModel\FişViewModel.cs" />
+    <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MainViewModelBase.cs" />
     <Compile Include="ViewModel\ÖdemeViewModel.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="ÖdemeView.xaml.cs">
       <DependentUpon>ÖdemeView.xaml</DependentUpon>
     </Compile>
-    <Page Include="FişView.xaml">
+    <Page Include="DocumentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,6 +149,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Report\report.lqd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Report\siparişler.lqd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

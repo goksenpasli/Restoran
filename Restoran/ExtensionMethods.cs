@@ -13,8 +13,11 @@ using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using DotLiquid;
+using HandyControl.Controls;
 using Restoran.Model;
 using Restoran.ViewModel;
+using dotTemplate = DotLiquid.Template;
 
 namespace Restoran
 {
@@ -39,6 +42,20 @@ namespace Restoran
         public static double DepoÜrünEşikAdeti(this Veriler veriler, int ürünid)
         {
             return veriler.Ürünler.Ürün.Any() ? veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == ürünid).UyarıAdet : 0;
+        }
+
+        public static double FiyatHesapla(this Sipariş sipariş)
+        {
+            return ÜrünleriYükle().FirstOrDefault(x => x.Id == sipariş.ÜrünId).Fiyat * sipariş.Adet;
+        }
+
+        public static string GenerateTemplate(this Hash context, string reportpath)
+        {
+            using FileStream stream = new(reportpath, FileMode.Open);
+            using StreamReader reader = new(stream);
+            dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
+            Hash docContext = context;
+            return template.Render(docContext);
         }
 
         public static string ResimYükle(this string file, double en, double boy)
@@ -151,7 +168,7 @@ namespace Restoran
             }
             catch (Exception Ex)
             {
-                _ = MessageBox.Show(Ex.Message);
+                Growl.Fatal(Ex.Message);
                 return null;
             }
         }
@@ -261,10 +278,7 @@ namespace Restoran
                     ? MainViewModelBase.xmldatapath.DeSerialize<Veriler>().Ürünler
                     : new Ürünler();
         }
-        public static double FiyatHesapla(this Sipariş sipariş)
-        {
-            return ExtensionMethods.ÜrünleriYükle().FirstOrDefault(x => x.Id == sipariş.ÜrünId).Fiyat * sipariş.Adet;
-        }
+
         internal static ObservableCollection<Ürün> ÜrünleriYükle()
         {
             return DesignerProperties.GetIsInDesignMode(new DependencyObject())

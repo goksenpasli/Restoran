@@ -10,6 +10,8 @@ namespace Restoran
     {
         public static CollectionViewSource cvs;
 
+        public static CollectionViewSource cvsmüşteri;
+
         public static CollectionViewSource cvsürün;
 
         public MainWindow()
@@ -18,6 +20,7 @@ namespace Restoran
             DataContext = new MainViewModel();
             cvs = TryFindResource("Siparişler") as CollectionViewSource;
             cvsürün = TryFindResource("Ürünler") as CollectionViewSource;
+            cvsmüşteri = TryFindResource("Müşteriler") as CollectionViewSource;
         }
     }
 }

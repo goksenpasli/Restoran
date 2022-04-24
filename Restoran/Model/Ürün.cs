@@ -34,6 +34,9 @@ namespace Restoran.Model
         [XmlAttribute(AttributeName = "AlışFiyat")]
         public double AlışFiyat { get; set; } = 1;
 
+        [XmlAttribute(AttributeName = "Barkod")]
+        public string Barkod { get; set; }
+
         public string Error => string.Empty;
 
         [XmlAttribute(AttributeName = "Favori")]

@@ -2,12 +2,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using DotLiquid;
 using PropertyChanged;
 
 namespace Restoran.Model
 {
     [XmlRoot(ElementName = "Siparişler")]
-    public class Siparişler : INotifyPropertyChanged
+    public class Siparişler : INotifyPropertyChanged, ILiquidizable
     {
         private double farkDakika;
 
@@ -39,5 +40,10 @@ namespace Restoran.Model
 
         [XmlAttribute(AttributeName = "ToplamTutar")]
         public double ToplamTutar { get; set; }
+
+        public object ToLiquid()
+        {
+            return new { TahsilatTarih, ToplamTutar, Tarih };
+        }
     }
 }

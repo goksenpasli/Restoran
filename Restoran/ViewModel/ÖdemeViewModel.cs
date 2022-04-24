@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using HandyControl.Controls;
 using Restoran.Model;
 
 namespace Restoran.ViewModel
@@ -17,8 +18,12 @@ namespace Restoran.ViewModel
 
             GeriVerilecekTutarıHesapla = new RelayCommand<object>(parameter =>
             {
-                double para = double.Parse(parameter.ToString());
-                GeriVerilecek = para - Siparişler.ToplamTutar;
+                GeriVerilecek = SeçiliPara - Siparişler.ToplamTutar;
+                if (GeriVerilecek < 0)
+                {
+                    GeriVerilecek = 0;
+                    Growl.Warning("Geri Verilecek Para 0 dan Küçük Olmaz.");
+                }
             }, parameter => true);
 
             PropertyChanged += ÖdemeViewModel_PropertyChanged;
@@ -32,6 +37,8 @@ namespace Restoran.ViewModel
 
         public ICommand İndirimUygula { get; }
 
+        public double SeçiliPara { get; set; }
+
         public Sipariş SeçiliSipariş { get; set; }
 
         public Siparişler Siparişler { get; set; }
@@ -43,9 +50,17 @@ namespace Restoran.ViewModel
 
         private void ÖdemeViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName is "Siparişler" && Siparişler is not null)
+            {
+                Siparişler.PropertyChanged += Siparişler_PropertyChanged;
+            }
             if (e.PropertyName is "SeçiliSipariş" && SeçiliSipariş is not null)
             {
                 SeçiliSipariş.PropertyChanged += SeçiliSipariş_PropertyChanged;
+            }
+            if (e.PropertyName is "SeçiliPara")
+            {
+                GeriVerilecekTutarıHesapla.Execute(SeçiliPara);
             }
         }
 
@@ -70,6 +85,14 @@ namespace Restoran.ViewModel
                     }
                 }
                 Siparişler.ToplamTutar = Siparişler.Sipariş.Sum(z => z.NormalFiyat);
+            }
+        }
+
+        private void Siparişler_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is "ToplamTutar")
+            {
+                GeriVerilecekTutarıHesapla.Execute(SeçiliPara);
             }
         }
     }

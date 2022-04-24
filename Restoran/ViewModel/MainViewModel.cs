@@ -12,7 +12,6 @@ using HandyControl.Data;
 using HandyControl.Interactivity;
 using Microsoft.Win32;
 using Restoran.Model;
-using dotTemplate = DotLiquid.Template;
 
 namespace Restoran.ViewModel
 {
@@ -43,10 +42,10 @@ namespace Restoran.ViewModel
             Kategori = new Kategori();
             Siparişler = new Siparişler();
             ÖdemeViewModel = new ÖdemeViewModel();
-            FişViewModel = new FişViewModel();
+            DocumentViewModel = new DocumentViewModel();
 
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
-            SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
+            SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1) && z.Ödendi).Sum(z => z.ToplamTutar) ?? 0;
 
             PropertyChanged += MainViewModel_PropertyChanged;
 
@@ -219,7 +218,8 @@ namespace Restoran.ViewModel
                         Resim = Ürün.Resim,
                         UyarıAdet = Ürün.UyarıAdet,
                         Favori = Ürün.Favori,
-                        KategoriId = SeçiliKategori.Id
+                        KategoriId = SeçiliKategori.Id,
+                        Barkod = Ürün.Barkod
                     };
 
                     Veriler?.Ürünler?.Ürün?.Add(ürün);
@@ -269,12 +269,35 @@ namespace Restoran.ViewModel
             {
                 if (File.Exists("Report\\report.lqd"))
                 {
-                    string template = GenerateTemplate("Report\\report.lqd");
+                    Hash fiş = Hash.FromAnonymousObject(new
+                    {
+                        Siparişler = SeçiliSipariş?.Sipariş.Select(sipariş => new Ürün() { Fiyat = Veriler.Ürünler.Ürün.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
+                        Toplam = SeçiliSipariş?.ToplamTutar,
+                        MasaNo = Masalar.SeçiliMasa.No
+                    });
+                    string template = fiş.GenerateTemplate("Report\\report.lqd");
                     FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
-                    FişViewModel.Document = fd.WriteXPS();
-                    _ = Dialog.Show(FişViewModel);
+                    DocumentViewModel.Document = fd.WriteXPS();
+                    DocumentViewModel.Başlık = "FİŞ";
+                    _ = Dialog.Show(DocumentViewModel);
                 }
             }, parameter => SeçiliSipariş is not null);
+
+            GünlükRaporEkranı = new RelayCommand<object>(parameter =>
+            {
+                if (File.Exists("Report\\report.lqd"))
+                {
+                    Hash günlükrapor = Hash.FromAnonymousObject(new
+                    {
+                        Siparişler = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > RaporSeçiliGün && z.Tarih < RaporSeçiliGün.AddDays(1))
+                    });
+                    string template = günlükrapor.GenerateTemplate("Report\\siparişler.lqd");
+                    FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
+                    DocumentViewModel.Document = fd.WriteXPS();
+                    DocumentViewModel.Başlık = "RAPOR";
+                    _ = Dialog.Show(DocumentViewModel);
+                }
+            }, parameter => true);
 
             ÖdemeEkranı = new RelayCommand<object>(parameter =>
             {
@@ -357,30 +380,13 @@ namespace Restoran.ViewModel
                 }
             }, parameter => SeçiliMüşteri?.Sipariş?.Any() == true && SeçiliMüşteri?.Ödendi == false);
 
-            ÜrünAra = new RelayCommand<object>(parameter => MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.Açıklama.Contains(ÜrünAramaMetin) == true, parameter => true);
+            ÜrünAra = new RelayCommand<object>(parameter => MainWindow.cvsürün.Filter += (s, e) => e.Accepted &= (e.Item as Ürün)?.Açıklama.Contains(ÜrünAramaMetin) == true || (e.Item as Ürün)?.Barkod == ÜrünAramaMetin, parameter => true);
+
+            MüşteriAra = new RelayCommand<object>(parameter => MainWindow.cvsmüşteri.Filter += (s, e) => e.Accepted &= (e.Item as Müşteri)?.Ad.Contains(MüşteriAramaMetin) == true, parameter => true);
 
             WebAdreseGit = new RelayCommand<object>(parameter => Process.Start(parameter as string), parameter => true);
 
             #endregion Commands
-        }
-
-        private Hash CreateDocumentContext()
-        {
-            return Hash.FromAnonymousObject(new
-            {
-                Siparişler = SeçiliSipariş?.Sipariş.Select(sipariş => new Ürün() { Fiyat = Veriler.Ürünler.Ürün.FirstOrDefault(ürün => ürün.Id == sipariş.ÜrünId).Fiyat, Adet = sipariş.Adet, Açıklama = Veriler.Ürünler.Ürün.FirstOrDefault(z => z.Id == sipariş.ÜrünId).Açıklama }),
-                Toplam = SeçiliSipariş?.Sipariş.SiparişToplamları(),
-                MasaNo = Masalar.SeçiliMasa.No
-            });
-        }
-
-        private string GenerateTemplate(string reportpath)
-        {
-            using FileStream stream = new(reportpath, FileMode.Open);
-            using StreamReader reader = new(stream);
-            dotTemplate template = dotTemplate.Parse(reader.ReadToEnd());
-            Hash docContext = CreateDocumentContext();
-            return template.Render(docContext);
         }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -408,7 +414,7 @@ namespace Restoran.ViewModel
             }
             if (e.PropertyName is "Masalar")
             {
-                SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1)).Sum(z => z.ToplamTutar) ?? 0;
+                SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1) && z.Ödendi).Sum(z => z.ToplamTutar) ?? 0;
             }
             if (e.PropertyName is "AramaSeçiliKategori")
             {

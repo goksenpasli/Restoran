@@ -23,11 +23,13 @@ namespace Restoran.ViewModel
 
         public ICommand DatabaseSave { get; set; }
 
+        public DocumentViewModel DocumentViewModel { get; set; }
+
         public int En { get; set; } = 1;
 
         public ICommand FişEkranı { get; set; }
 
-        public FişViewModel FişViewModel { get; set; }
+        public ICommand GünlükRaporEkranı { get; set; }
 
         public ICommand İlaveÜrünEkle { get; set; }
 
@@ -57,6 +59,10 @@ namespace Restoran.ViewModel
 
         public Müşteri Müşteri { get; set; }
 
+        public ICommand MüşteriAra { get; set; }
+
+        public string MüşteriAramaMetin { get; set; }
+
         public ICommand MüşteriEkle { get; set; }
 
         public ICommand MüşteriSeçiliSiparişSil { get; set; }
@@ -74,6 +80,8 @@ namespace Restoran.ViewModel
         public ÖdemeViewModel ÖdemeViewModel { get; set; }
 
         public OptimizedObservableCollection<Masa> ÖnizlemeMasa { get; set; }
+
+        public DateTime RaporSeçiliGün { get; set; } = DateTime.Today;
 
         public string SalonAdı { get; set; }
 
