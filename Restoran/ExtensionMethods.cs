@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
+using System.Windows.Xps.Serialization;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using DotLiquid;
@@ -146,16 +147,17 @@ namespace Restoran
 
         public static FixedDocumentSequence WriteXPS(this FlowDocument flowDocument)
         {
-            string temp = Path.GetTempFileName();
-            if (File.Exists(temp))
+            Package package = Package.Open(new MemoryStream(), FileMode.Create, FileAccess.ReadWrite);
+            Uri packUri = new("pack://temp.xps");
+            PackageStore.RemovePackage(packUri);
+            PackageStore.AddPackage(packUri, package);
+            using XpsDocument xpsDocument = new(package, CompressionOption.SuperFast, packUri.ToString());
+            DocumentPaginator paginator = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
+            using (var xpsSerializationManager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false))
             {
-                File.Delete(temp);
+                xpsSerializationManager.SaveAsXaml(paginator);
             }
-
-            XpsDocument xpsDoc = new(temp, FileAccess.ReadWrite);
-            XpsDocumentWriter xpsWriter = XpsDocument.CreateXpsDocumentWriter(xpsDoc);
-            xpsWriter.Write((flowDocument as IDocumentPaginatorSource)?.DocumentPaginator);
-            return xpsDoc.GetFixedDocumentSequence();
+            return xpsDocument.GetFixedDocumentSequence();
         }
 
         internal static T DeSerialize<T>(this string xmldatapath) where T : class, new()

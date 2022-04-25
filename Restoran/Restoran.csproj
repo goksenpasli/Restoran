@@ -41,6 +41,9 @@
   <PropertyGroup>
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotLiquid, Version=2.2.614.0, Culture=neutral, PublicKeyToken=82e46016ecf9f07c, processorArchitecture=MSIL">
       <HintPath>..\packages\DotLiquid.2.2.614\lib\net45\DotLiquid.dll</HintPath>
@@ -99,8 +102,10 @@
     <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MainViewModelBase.cs" />
+    <Compile Include="ViewModel\ShadowedImage.cs" />
     <Compile Include="ViewModel\ÖdemeViewModel.cs" />
     <Compile Include="VirtualizingTilePanel.cs" />
+    <Compile Include="VirtualizingWrapPanel.cs" />
     <Compile Include="ÖdemeView.xaml.cs">
       <DependentUpon>ÖdemeView.xaml</DependentUpon>
     </Compile>
@@ -143,6 +148,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

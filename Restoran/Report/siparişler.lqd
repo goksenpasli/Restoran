@@ -55,4 +55,11 @@
 		</TableRowGroup>
 		{% endfor -%}
 	</Table>
+	<BlockUIContainer>
+		<Line X1="0" X2="21cm" StrokeThickness="2" StrokeDashArray="2 2" Stroke="Black"/>
+	</BlockUIContainer>
+	<Paragraph TextAlignment="Right" Margin="0" Foreground="Black">
+		<Run Text="GENEL TOPLAM:" />
+		<Run Text="{{ GenelToplam|currency:c}}" FontWeight="Bold" />
+	</Paragraph>
 </FlowDocument>

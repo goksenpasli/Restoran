@@ -105,7 +105,11 @@ namespace Restoran.ViewModel
 
         public ICommand SiparişTahsilEt { get; set; }
 
+        public ICommand SiparişTaşı { get; set; }
+
         public bool TahsilatTabSelected { get; set; }
+
+        public Masa TaşınacakMasa { get; set; }
 
         public bool TümKayıtlar { get; set; } = true;
 
@@ -116,6 +120,8 @@ namespace Restoran.ViewModel
         public string ÜrünAramaMetin { get; set; }
 
         public ICommand ÜrünKaydet { get; set; }
+
+        public ICommand ÜrünResimGüncelle { get; set; }
 
         public ICommand ÜrünResimYükle { get; set; }
 

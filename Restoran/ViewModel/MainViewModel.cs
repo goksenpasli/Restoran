@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +11,7 @@ using DotLiquid;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Interactivity;
+using HandyControl.Tools;
 using Microsoft.Win32;
 using Restoran.Model;
 
@@ -20,6 +22,7 @@ namespace Restoran.ViewModel
         static MainViewModel()
         {
             Yıllar = Enumerable.Range(DateTime.Now.Year - 5, 10);
+            ConfigHelper.Instance.SetLang("tr");
         }
 
         public MainViewModel()
@@ -199,8 +202,12 @@ namespace Restoran.ViewModel
 
                     Veriler?.Salonlar?.Masalar?.Add(masalar);
                     DatabaseSave.Execute(null);
-                    ÖnizlemeMasa.Clear();
                     Growl.Success("Masa Düzeni Oluşturuldu.");
+
+                    ÖnizlemeMasa.Clear();
+                    En = 1;
+                    Boy = 1;
+                    SalonAdı = null;
                 }
             }, parameter => ÖnizlemeMasa?.Count(z => !z.Gizli) > 0 && !string.IsNullOrWhiteSpace(SalonAdı));
 
@@ -265,6 +272,32 @@ namespace Restoran.ViewModel
                 }
             }, parameter => true);
 
+            ÜrünResimGüncelle = new RelayCommand<object>(parameter =>
+            {
+                OpenFileDialog openFileDialog = new() { Multiselect = false, Filter = "Resim Dosyaları (*.jpg;*.jpeg;*.tif;*.tiff;*.png)|*.jpg;*.jpeg;*.tif;*.tiff;*.png" };
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    (parameter as Ürün).Resim = openFileDialog.FileName.ResimYükle(64, 64);
+                }
+            }, parameter => true);
+
+            SiparişTaşı = new RelayCommand<object>(parameter =>
+            {
+                if (!TaşınacakMasa.Dolu)
+                {
+                    TaşınacakMasa.Siparişler.Add(SeçiliSipariş);
+                    TaşınacakMasa.Dolu = true;
+                    Masalar?.SeçiliMasa?.Siparişler?.Remove(SeçiliSipariş);
+                    Masalar.SeçiliMasa.Dolu = false;
+                    DatabaseSave.Execute(null);
+                    TaşınacakMasa = null;
+                }
+                else
+                {
+                    Growl.Warning("Taşınacak Masa Dolu Başka Masa Seçin.");
+                }
+            }, parameter => TaşınacakMasa is not null);
+
             FişEkranı = new RelayCommand<object>(parameter =>
             {
                 if (File.Exists("Report\\report.lqd"))
@@ -279,7 +312,9 @@ namespace Restoran.ViewModel
                     FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
                     DocumentViewModel.Document = fd.WriteXPS();
                     DocumentViewModel.Başlık = "FİŞ";
-                    _ = Dialog.Show(DocumentViewModel);
+                    Dialog dialog = Dialog.Show(DocumentViewModel);
+                    dialog.Width = 720;
+                    dialog.Height = 480;
                 }
             }, parameter => SeçiliSipariş is not null);
 
@@ -287,15 +322,22 @@ namespace Restoran.ViewModel
             {
                 if (File.Exists("Report\\report.lqd"))
                 {
-                    Hash günlükrapor = Hash.FromAnonymousObject(new
+                    IEnumerable<Siparişler> data = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > RaporSeçiliGün && z.Tarih < RaporSeçiliGün.AddDays(1));
+                    if (data != null)
                     {
-                        Siparişler = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > RaporSeçiliGün && z.Tarih < RaporSeçiliGün.AddDays(1))
-                    });
-                    string template = günlükrapor.GenerateTemplate("Report\\siparişler.lqd");
-                    FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
-                    DocumentViewModel.Document = fd.WriteXPS();
-                    DocumentViewModel.Başlık = "RAPOR";
-                    _ = Dialog.Show(DocumentViewModel);
+                        Hash günlükrapor = Hash.FromAnonymousObject(new
+                        {
+                            Siparişler = data.OrderByDescending(z => z.Tarih),
+                            GenelToplam = data.Sum(z => z.ToplamTutar)
+                        });
+                        string template = günlükrapor.GenerateTemplate("Report\\siparişler.lqd");
+                        FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
+                        DocumentViewModel.Document = fd.WriteXPS();
+                        DocumentViewModel.Başlık = "RAPOR";
+                        Dialog dialog = Dialog.Show(DocumentViewModel);
+                        dialog.Width = 720;
+                        dialog.Height = 480;
+                    }
                 }
             }, parameter => true);
 

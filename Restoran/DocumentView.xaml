@@ -3,11 +3,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:local="clr-namespace:Restoran"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodel="clr-namespace:Restoran.ViewModel" 
+    xmlns:viewmodel="clr-namespace:Restoran.ViewModel"
     d:DataContext="{d:DesignInstance Type=viewmodel:DocumentViewModel}"
-    Background="{DynamicResource RegionBrush}" d:Width="800"
-    CornerRadius="10" UseLayoutRounding="True" mc:Ignorable="d">
-    <GroupBox Margin="4" Header="{Binding Başlık}">
+    d:Width="800" CornerRadius="0" 
+    Background="{DynamicResource PrimaryBrush}"
+    Style="{StaticResource BorderRegion}"
+    UseLayoutRounding="True" mc:Ignorable="d">
+    <GroupBox Header="{Binding Başlık}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
