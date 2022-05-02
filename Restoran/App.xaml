@@ -14,6 +14,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <hc:ThemeResources UsingSystemTheme="False" />
                 <hc:Theme />
+                <hc:IntellisenseResources Source="/HandyControl;Component/DesignTime/DesignTimeResources.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <Converter:BooltoVisibilityConverter x:Key="BooltoVisibilityConverter" />
@@ -27,6 +28,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type ViewModel:DocumentViewModel}">
                 <local:DocumentView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type ViewModel:RezervasyonViewModel}">
+                <local:RezervasyonView />
             </DataTemplate>
             <ObjectDataProvider x:Key="ÖdemeŞekilleri" MethodName="GetValues"
                 ObjectType="{x:Type System:Enum}">
@@ -204,28 +208,50 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <hc:Badge Margin="0,12,6,0">
-                                <hc:Badge.Style>
-                                    <Style BasedOn="{hc:StaticResource BadgeBaseStyle}" TargetType="hc:Badge">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Dolu}" Value="true">
-                                                <Setter Property="Text" Value="Dolu" />
-                                                <Setter Property="Background" Value="Red" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Dolu}" Value="false">
-                                                <Setter Property="Text" Value="Boş" />
-                                                <Setter Property="Background" Value="Green" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding MasaToplamSiparişDurumuGöster}" Value="true">
-                                                <Setter Property="Text" Value="{Binding Siparişler.Count}" />
-                                                <Setter Property="Background" Value="Yellow" />
-                                                <Setter Property="Foreground" Value="Black" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </hc:Badge.Style>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <hc:Badge Margin="0,12,6,0">
+                                        <hc:Badge.Style>
+                                            <Style BasedOn="{hc:StaticResource BadgeBaseStyle}" TargetType="hc:Badge">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Dolu}" Value="true">
+                                                        <Setter Property="Text" Value="Dolu" />
+                                                        <Setter Property="Background" Value="Red" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Dolu}" Value="false">
+                                                        <Setter Property="Text" Value="Boş" />
+                                                        <Setter Property="Background" Value="Green" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding MasaToplamSiparişDurumuGöster}" Value="true">
+                                                        <Setter Property="Text" Value="{Binding Siparişler.Count}" />
+                                                        <Setter Property="Background" Value="Yellow" />
+                                                        <Setter Property="Foreground" Value="Black" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </hc:Badge.Style>
+                                    </hc:Badge>
+                                    <hc:Badge Margin="4,12,6,0">
+                                        <hc:Badge.Style>
+                                            <Style BasedOn="{hc:StaticResource BadgeBaseStyle}" TargetType="hc:Badge">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Rezerve}" Value="true">
+                                                        <Setter Property="Text" Value="Rezerve" />
+                                                        <Setter Property="Background" Value="Orange" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Rezerve}" Value="false">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </hc:Badge.Style>
+                                    </hc:Badge>
+                                </StackPanel>
                                 <Viewbox d:Height="32" d:Width="32">
-                                    <StackPanel>
+                                    <StackPanel Background="Transparent">
+                                        <StackPanel.InputBindings>
+                                            <MouseBinding Command="{Binding DataContext.RezervasyonEkranı, RelativeSource={RelativeSource AncestorType=Window}}" MouseAction="LeftDoubleClick" />
+                                        </StackPanel.InputBindings>
                                         <TextBlock HorizontalAlignment="Center" Foreground="Black"
                                             Text="{Binding No}" />
                                         <Border Width="50" Height="50" HorizontalAlignment="Left"
@@ -236,7 +262,7 @@
                                             BorderThickness="2" />
                                     </StackPanel>
                                 </Viewbox>
-                            </hc:Badge>
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                     <ListBox.ItemsPanel>

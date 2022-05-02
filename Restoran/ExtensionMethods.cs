@@ -153,7 +153,7 @@ namespace Restoran
             PackageStore.AddPackage(packUri, package);
             using XpsDocument xpsDocument = new(package, CompressionOption.SuperFast, packUri.ToString());
             DocumentPaginator paginator = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
-            using (var xpsSerializationManager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false))
+            using (XpsSerializationManager xpsSerializationManager = new(new XpsPackagingPolicy(xpsDocument), false))
             {
                 xpsSerializationManager.SaveAsXaml(paginator);
             }

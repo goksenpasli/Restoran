@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
@@ -83,6 +84,12 @@ namespace Restoran.ViewModel
 
         public DateTime RaporSeçiliGün { get; set; } = DateTime.Today;
 
+        public ICommand RezervasyonEkranı { get; set; }
+
+        public Rezervasyonlar Rezervasyonlar { get; set; }
+
+        public RezervasyonViewModel RezervasyonViewModel { get; set; }
+
         public string SalonAdı { get; set; }
 
         public bool SalonTabSelected { get; set; } = true;
@@ -130,6 +137,8 @@ namespace Restoran.ViewModel
         public ICommand WebAdreseGit { get; set; }
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
+
+        public ObservableCollection<Rezervasyonlar> GetRezervasyonlars { get; set; }
 
         public static void DepoKontrol(double adet, double eşik)
         {

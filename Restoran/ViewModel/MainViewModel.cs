@@ -14,6 +14,7 @@ using HandyControl.Interactivity;
 using HandyControl.Tools;
 using Microsoft.Win32;
 using Restoran.Model;
+using System.Collections.ObjectModel;
 
 namespace Restoran.ViewModel
 {
@@ -43,10 +44,14 @@ namespace Restoran.ViewModel
 
             Ürün = new Ürün();
             Kategori = new Kategori();
+            Müşteri = new Müşteri();
             Siparişler = new Siparişler();
+            Rezervasyonlar = new Rezervasyonlar();
             ÖdemeViewModel = new ÖdemeViewModel();
             DocumentViewModel = new DocumentViewModel();
+            RezervasyonViewModel = new RezervasyonViewModel();
 
+            GetRezervasyonlars =new ObservableCollection<Rezervasyonlar>( Veriler.Salonlar.Masalar.SelectMany(z => z.Masa).SelectMany(z => z.Rezervasyonlar));
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1) && z.Ödendi).Sum(z => z.ToplamTutar) ?? 0;
 
@@ -113,8 +118,7 @@ namespace Restoran.ViewModel
             {
                 if (parameter is Sipariş sipariş)
                 {
-                    _ = SeçiliSipariş?.Sipariş?.Remove(sipariş);
-                    SeçiliSipariş.ToplamTutar = SeçiliSipariş?.Sipariş?.SiparişToplamları() ?? 0;
+                    _ = Siparişler.Sipariş.Remove(sipariş);
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
 
@@ -127,6 +131,7 @@ namespace Restoran.ViewModel
                         _ = Masalar?.SeçiliMasa?.Siparişler?.Remove(siparişler);
                         Masalar.SeçiliMasa.Dolu = false;
                         DatabaseSave.Execute(null);
+                        Growl.Success("Sipariş Silindi.");
                     }
                 }
             }, parameter => Masalar?.SeçiliMasa is not null);
@@ -175,6 +180,10 @@ namespace Restoran.ViewModel
                     siparişler.Ödendi = true;
                     siparişler.TahsilatTarih = DateTime.Now;
                     Masalar.SeçiliMasa.Dolu = false;
+                    if (Masalar.SeçiliMasa.Rezerve)
+                    {
+                        Masalar.SeçiliMasa.Rezerve = false;
+                    }
                     ExtensionMethods.ÜrünAdetDüşümüYap(siparişler.Sipariş, Veriler.Ürünler.Ürün);
 
                     DatabaseSave.Execute(null);
@@ -257,7 +266,7 @@ namespace Restoran.ViewModel
             {
                 if (HandyControl.Controls.MessageBox.Show(new MessageBoxInfo { Message = "Kategori Silinsin mi?", Caption = App.Current.MainWindow.Title, Button = MessageBoxButton.YesNo, IconBrushKey = ResourceToken.AccentBrush, IconKey = ResourceToken.AskGeometry, StyleKey = "MessageBoxCustom" }) == MessageBoxResult.Yes)
                 {
-                    _ = (Veriler?.Kategoriler?.Kategori?.Remove(parameter as Kategori));
+                    _ = Veriler?.Kategoriler?.Kategori?.Remove(parameter as Kategori);
                     DatabaseSave.Execute(null);
                     Growl.Success("Kategori Silindi.");
                 }
@@ -283,18 +292,18 @@ namespace Restoran.ViewModel
 
             SiparişTaşı = new RelayCommand<object>(parameter =>
             {
-                if (!TaşınacakMasa.Dolu)
+                if (!TaşınacakMasa.Dolu && !TaşınacakMasa.Gizli)
                 {
                     TaşınacakMasa.Siparişler.Add(SeçiliSipariş);
                     TaşınacakMasa.Dolu = true;
-                    Masalar?.SeçiliMasa?.Siparişler?.Remove(SeçiliSipariş);
+                    _ = Masalar?.SeçiliMasa?.Siparişler?.Remove(SeçiliSipariş);
                     Masalar.SeçiliMasa.Dolu = false;
                     DatabaseSave.Execute(null);
                     TaşınacakMasa = null;
                 }
                 else
                 {
-                    Growl.Warning("Taşınacak Masa Dolu Başka Masa Seçin.");
+                    Growl.Warning("Taşınacak Masa Dolu Veya Gizli Olmamalıdır. Başka Masa Seçin.");
                 }
             }, parameter => TaşınacakMasa is not null);
 
@@ -312,9 +321,7 @@ namespace Restoran.ViewModel
                     FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
                     DocumentViewModel.Document = fd.WriteXPS();
                     DocumentViewModel.Başlık = "FİŞ";
-                    Dialog dialog = Dialog.Show(DocumentViewModel);
-                    dialog.Width = 720;
-                    dialog.Height = 480;
+                    _ = Dialog.Show(DocumentViewModel);
                 }
             }, parameter => SeçiliSipariş is not null);
 
@@ -334,9 +341,7 @@ namespace Restoran.ViewModel
                         FlowDocument fd = (FlowDocument)XamlReader.Parse(template);
                         DocumentViewModel.Document = fd.WriteXPS();
                         DocumentViewModel.Başlık = "RAPOR";
-                        Dialog dialog = Dialog.Show(DocumentViewModel);
-                        dialog.Width = 720;
-                        dialog.Height = 480;
+                        _ = Dialog.Show(DocumentViewModel);
                     }
                 }
             }, parameter => true);
@@ -350,7 +355,11 @@ namespace Restoran.ViewModel
                 _ = Dialog.Show(ÖdemeViewModel);
             }, parameter => SeçiliSipariş is not null);
 
-            Müşteri = new Müşteri();
+            RezervasyonEkranı = new RelayCommand<object>(parameter =>
+            {
+                RezervasyonViewModel.SeçiliMasa = Masalar.SeçiliMasa;
+                _ = Dialog.Show(RezervasyonViewModel);
+            }, parameter => true);
 
             MüşteriSiparişEkle = new RelayCommand<object>(parameter =>
             {
@@ -456,6 +465,7 @@ namespace Restoran.ViewModel
             }
             if (e.PropertyName is "Masalar")
             {
+                IEnumerable<Rezervasyonlar> Rezervasyonlar = Masalar?.Masa?.SelectMany(z => z.Rezervasyonlar).Where(z => z.RezervasyonTarihi > DateTime.Today && z.RezervasyonTarihi < DateTime.Today.AddDays(1));
                 SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1) && z.Ödendi).Sum(z => z.ToplamTutar) ?? 0;
             }
             if (e.PropertyName is "AramaSeçiliKategori")

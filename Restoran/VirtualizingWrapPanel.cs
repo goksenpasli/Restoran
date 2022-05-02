@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace Restoran
 {
@@ -114,6 +111,8 @@ namespace Restoran
 
         #region MeasureOverride, ArrangeOverride
 
+        private readonly Dictionary<int, Rect> _containerLayouts = new();
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             foreach (UIElement child in InternalChildren)
@@ -205,8 +204,6 @@ namespace Restoran
             return maxSize;
         }
 
-        private readonly Dictionary<int, Rect> _containerLayouts = new();
-
         #region ChildGenerator
 
         private class ChildGenerator : IDisposable
@@ -262,14 +259,14 @@ namespace Restoran
                 _generator = owner.ItemContainerGenerator;
             }
 
-            public void Dispose()
-            {
-                _generatorTracker?.Dispose();
-            }
-
             ~ChildGenerator()
             {
                 Dispose();
+            }
+
+            public void Dispose()
+            {
+                _generatorTracker?.Dispose();
             }
 
             #endregion _ctor
@@ -368,7 +365,7 @@ namespace Restoran
                     }
                 }
 
-                return (_containerLayouts.ContainsKey(idx)) ? _containerLayouts[idx].Size : _prevSize;
+                return _containerLayouts.ContainsKey(idx) ? _containerLayouts[idx].Size : _prevSize;
             });
             Size size = getSize(index);
             if (!double.IsNaN(ItemWidth))
@@ -390,31 +387,31 @@ namespace Restoran
 
         #region Extent
 
+        private Size _extent;
+
         public double ExtentHeight => _extent.Height;
 
         public double ExtentWidth => _extent.Width;
-
-        private Size _extent;
 
         #endregion Extent
 
         #region Viewport
 
+        private Size _viewport;
+
         public double ViewportHeight => _viewport.Height;
 
         public double ViewportWidth => _viewport.Width;
-
-        private Size _viewport;
 
         #endregion Viewport
 
         #region Offset
 
+        private Point _offset;
+
         public double HorizontalOffset => _offset.X;
 
         public double VerticalOffset => _offset.Y;
-
-        private Point _offset;
 
         #endregion Offset
 

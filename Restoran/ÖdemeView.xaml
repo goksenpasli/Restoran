@@ -6,8 +6,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:Restoran.Model" Width="720" Height="480"
     d:DataContext="{d:DesignInstance Type=ViewModel:ÖdemeViewModel}"
-    Background="{DynamicResource RegionBrush}"
-    CornerRadius="10" UseLayoutRounding="True" mc:Ignorable="d">
+    Background="{DynamicResource PrimaryBrush}"
+    CornerRadius="10"
+    Style="{StaticResource BorderRegion}"
+    UseLayoutRounding="True" mc:Ignorable="d">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*" />
@@ -48,7 +50,7 @@
                 FontWeight="Bold" Foreground="Red"
                 Text="{Binding Siparişler.ToplamTutar, StringFormat=TOPLAM \{0:C\}}" />
             <TextBlock Grid.Row="1" d:Text="GeriVerilecek" FontSize="24"
-                FontWeight="Bold" Foreground="Green"
+                FontWeight="Bold" Foreground="Yellow"
                 Text="{Binding GeriVerilecek, StringFormat=GERİ VERİLECEK \{0:C\}}" />
             <ListView Grid.Row="2"
                 DataContext="{DynamicResource Döviz}"
