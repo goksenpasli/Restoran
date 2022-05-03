@@ -46,11 +46,16 @@
                     SelectedItem="{Binding Rezervasyon}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock FontWeight="Bold">
-                                <Run Text="{Binding Ad}" />
-                                <Run Text="{Binding Soyad}" />
-                                <Run Text="{Binding RezervasyonTarihi}" />
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold">
+                                    <Run Text="{Binding Ad}" />
+                                    <Run Text="{Binding Soyad}" />
+                                    <Run Text="{Binding RezervasyonTarihi}" />
+                                </TextBlock>
+                                <Button Content="SİL" Command="{Binding DataContext. MüşteriSil, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Style="{hc:StaticResource ButtonDanger}" />
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

@@ -25,7 +25,7 @@
                 <ComponentModel:SortDescription Direction="Descending" PropertyName="Tarih" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
-        <CollectionViewSource x:Key="Rezervasyonlar" Source="{Binding GetRezervasyonlars}">
+        <CollectionViewSource x:Key="Rezervasyonlar" Source="{Binding RezervasyonListeleri}">
             <CollectionViewSource.SortDescriptions>
                 <ComponentModel:SortDescription Direction="Ascending" PropertyName="RezervasyonTarihi" />
             </CollectionViewSource.SortDescriptions>
@@ -75,7 +75,6 @@
                             <hc:TabControl d:ItemsSource="{d:SampleData ItemCount=5}"
                                 ItemsSource="{Binding Veriler.Salonlar.Masalar}"
                                 SelectedItem="{Binding Masalar}"
-                                ShowContextMenu="False"
                                 Style="{hc:StaticResource TabControlCapsuleSolid}">
                                 <TabControl.ItemTemplate>
                                     <DataTemplate>
@@ -101,6 +100,11 @@
                             d:ItemsSource="{d:SampleData ItemCount=5}"
                             IsSynchronizedWithCurrentItem="False"
                             ItemsSource="{Binding Mode=OneWay, Source={StaticResource Rezervasyonlar}}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Visibility" Value="{Binding RezervasyonTarihi, Converter={StaticResource RezervasyonSüreGeçtiConverter}}" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -228,7 +232,7 @@
                         <GroupBox>
                             <GroupBox.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <hc:SearchBar Width="200" hc:InfoElement.Placeholder="ÜRÜN ARA" hc:InfoElement.Title="ÜRÜNLER"
+                                    <hc:SearchBar Width="150" hc:InfoElement.Placeholder="ÜRÜN ARA" hc:InfoElement.Title="ÜRÜNLER"
                                         hc:InfoElement.TitlePlacement="Left"
                                         Command="{Binding ÜrünAra}"
                                         IsRealTime="True" ShowClearButton="True"

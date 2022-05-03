@@ -138,7 +138,7 @@ namespace Restoran.ViewModel
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
 
-        public ObservableCollection<Rezervasyonlar> GetRezervasyonlars { get; set; }
+        public ObservableCollection<Rezervasyonlar> RezervasyonListeleri { get; set; }
 
         public static void DepoKontrol(double adet, double eşik)
         {

@@ -22,6 +22,7 @@
             <hc:Boolean2BooleanReConverter x:Key="Boolean2BooleanReConverter" />
             <hc:Object2BooleanConverter x:Key="Object2BooleanConverter" />
             <Converter:FilePathMergeConverter x:Key="FilePathMergeConverter" />
+            <Converter:RezervasyonSüreGeçtiConverter x:Key="RezervasyonSüreGeçtiConverter" />
             <Converter:SiparişSumConverter x:Key="SiparişSumConverter" />
             <DataTemplate DataType="{x:Type ViewModel:ÖdemeViewModel}">
                 <local:ÖdemeView />

@@ -81,6 +81,7 @@
     <Compile Include="Converter\BooltoVisibilityConverter.cs" />
     <Compile Include="Converter\FilePathMergeConverter.cs" />
     <Compile Include="Converter\SiparişSumConverter.cs" />
+    <Compile Include="Converter\RezervasyonSüreGeçtiConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>

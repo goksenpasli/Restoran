@@ -21,15 +21,30 @@ namespace Restoran.ViewModel
                         Soyad = Soyad,
                         Id = ExtensionMethods.RandomNumber(),
                         RezervasyonTarihi = RezervasyonTarihi,
-                        MasaId=SeçiliMasa.Id,
+                        MasaId = SeçiliMasa.Id,
                     };
                     SeçiliMasa.Rezervasyonlar.Add(rezervasyon);
-                    mainViewModel.GetRezervasyonlars.Add(rezervasyon);
+                    mainViewModel.RezervasyonListeleri.Add(rezervasyon);
                     SeçiliMasa.Rezerve = true;
                     mainViewModel.DatabaseSave.Execute(null);
                     Reset();
                 }
             }, parameter => !string.IsNullOrWhiteSpace(Ad) && !string.IsNullOrWhiteSpace(Soyad) && !string.IsNullOrWhiteSpace(Telefon));
+
+            MüşteriSil = new RelayCommand<object>(parameter =>
+            {
+                if (parameter is MainViewModel mainViewModel)
+                {
+                    mainViewModel.RezervasyonListeleri.Remove(Rezervasyon);
+                    SeçiliMasa.Rezervasyonlar.Remove(Rezervasyon);
+                    if (SeçiliMasa.Rezervasyonlar.All(z=>z.RezervasyonTarihi <= DateTime.Now))
+                    {
+                        SeçiliMasa.Rezerve = false;
+                    }
+                    mainViewModel.DatabaseSave.Execute(null);
+                    Reset();
+                }
+            }, parameter => Rezervasyon is not null);
 
             RezervasyonKaydet = new RelayCommand<object>(parameter =>
             {
@@ -46,15 +61,17 @@ namespace Restoran.ViewModel
 
         public ICommand MüşteriKaydet { get; set; }
 
+        public ICommand MüşteriSil { get; set; }
+
         public Rezervasyonlar Rezervasyon { get; set; }
 
         public ICommand RezervasyonKaydet { get; set; }
 
-        public Ürün SeçiliÜrün { get; set; }
-
         public DateTime RezervasyonTarihi { get; set; } = DateTime.Today;
 
         public Masa SeçiliMasa { get; set; }
+
+        public Ürün SeçiliÜrün { get; set; }
 
         public string Soyad { get; set; }
 

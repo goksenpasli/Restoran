@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +15,6 @@ using HandyControl.Interactivity;
 using HandyControl.Tools;
 using Microsoft.Win32;
 using Restoran.Model;
-using System.Collections.ObjectModel;
 
 namespace Restoran.ViewModel
 {
@@ -51,7 +51,7 @@ namespace Restoran.ViewModel
             DocumentViewModel = new DocumentViewModel();
             RezervasyonViewModel = new RezervasyonViewModel();
 
-            GetRezervasyonlars =new ObservableCollection<Rezervasyonlar>( Veriler.Salonlar.Masalar.SelectMany(z => z.Masa).SelectMany(z => z.Rezervasyonlar));
+            RezervasyonListeleri = new ObservableCollection<Rezervasyonlar>(Veriler.Salonlar.Masalar.SelectMany(z => z.Masa).SelectMany(z => z.Rezervasyonlar));
             Masalar = Veriler?.Salonlar?.Masalar?.FirstOrDefault();
             SeçiliSalonGünlükSiparişToplamı = Masalar?.Masa?.SelectMany(z => z.Siparişler).Where(z => z.Tarih > DateTime.Today && z.Tarih < DateTime.Today.AddDays(1) && z.Ödendi).Sum(z => z.ToplamTutar) ?? 0;
 
@@ -180,7 +180,7 @@ namespace Restoran.ViewModel
                     siparişler.Ödendi = true;
                     siparişler.TahsilatTarih = DateTime.Now;
                     Masalar.SeçiliMasa.Dolu = false;
-                    if (Masalar.SeçiliMasa.Rezerve)
+                    if (Masalar.SeçiliMasa.Rezervasyonlar.All(z => z.RezervasyonTarihi <= DateTime.Now))
                     {
                         Masalar.SeçiliMasa.Rezerve = false;
                     }
