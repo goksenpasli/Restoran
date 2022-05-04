@@ -75,9 +75,6 @@
             CommandParameter="{Binding Siparişler}"
             Content="TAHSİL ET"
             Style="{hc:StaticResource ButtonSuccess}" />
-        <Button Grid.Row="5" Grid.Column="2" HorizontalAlignment="Stretch"
-            Command="hc:ControlCommands.Close" Content="KAPAT"
-            Style="{hc:StaticResource ButtonWarning}" />
         <GroupBox Grid.Column="1" Header="AYRINTI">
             <StackPanel>
                 <CheckBox IsChecked="{Binding SeçiliSipariş.İndirimSeçili}" IsEnabled="{Binding SeçiliSipariş, Converter={StaticResource Object2BooleanConverter}}">
@@ -132,5 +129,12 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
+        <Button Grid.ColumnSpan="2" Width="22" Height="22"
+            Margin="0,4,4,0" Padding="0" HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            hc:IconElement.Geometry="{StaticResource ErrorGeometry}"
+            Command="hc:ControlCommands.Close"
+            Foreground="{DynamicResource PrimaryBrush}"
+            Style="{StaticResource ButtonIcon}" />
     </Grid>
 </Border>

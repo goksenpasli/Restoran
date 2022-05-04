@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -14,13 +13,13 @@ namespace Restoran.Model
         public string Ad { get; set; }
 
         [XmlAttribute(AttributeName = "Id")]
-        public int Id { get; set; }   
-        
-        [XmlAttribute(AttributeName = "MasaId")]
-        public int MasaId { get; set; }
+        public int Id { get; set; }
 
         [XmlAttribute(AttributeName = "İptal")]
         public bool İptal { get; set; }
+
+        [XmlAttribute(AttributeName = "MasaId")]
+        public int MasaId { get; set; }
 
         [XmlAttribute(AttributeName = "RezervasyonTarihi")]
         public DateTime RezervasyonTarihi { get; set; } = DateTime.Today;

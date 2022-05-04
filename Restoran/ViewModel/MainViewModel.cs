@@ -357,7 +357,7 @@ namespace Restoran.ViewModel
 
             RezervasyonEkranı = new RelayCommand<object>(parameter =>
             {
-                RezervasyonViewModel.SeçiliMasa = Masalar.SeçiliMasa;
+                RezervasyonViewModel.SeçiliMasa = parameter as Masa;
                 _ = Dialog.Show(RezervasyonViewModel);
             }, parameter => true);
 

@@ -120,9 +120,13 @@
                                             Template="{StaticResource ComboBoxSimpleTemplate}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock VerticalAlignment="Center" FontSize="18" FontWeight="Bold"
-                                                        Foreground="Red"
-                                                        Text="{Binding No, StringFormat={}{0} Nolu Masa}" />
+                                                    <TextBlock VerticalAlignment="Center" FontSize="18" FontWeight="Bold">
+                                                        <Hyperlink Command="{Binding DataContext.RezervasyonEkranı, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Foreground="Red" TextDecorations="None">
+                                                            <Run Text="{Binding No, StringFormat={}{0} Nolu Masa}" />
+                                                        </Hyperlink>
+                                                    </TextBlock>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
                                         </ComboBox>

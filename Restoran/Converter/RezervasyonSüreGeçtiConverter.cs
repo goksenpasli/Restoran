@@ -14,21 +14,9 @@ namespace Restoran.Converter
             {
                 return Visibility.Visible;
             }
-            if (value is DateTime rezervasyontarihi)
-            {
-                if (rezervasyontarihi <= DateTime.Now)
-                {
-                    return Visibility.Collapsed;
-                }
-                else
-                {
-                    return Visibility.Visible;
-                }
-            }
-            else
-            {
-                return Visibility.Collapsed;
-            }
+            return value is DateTime rezervasyontarihi
+                ? rezervasyontarihi <= DateTime.Now ? Visibility.Collapsed : (object)Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

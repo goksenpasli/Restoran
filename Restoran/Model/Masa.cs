@@ -10,10 +10,7 @@ namespace Restoran.Model
         public event PropertyChangedEventHandler PropertyChanged;
 
         [XmlAttribute(AttributeName = "Dolu")]
-        public bool Dolu { get; set; }    
-        
-        [XmlAttribute(AttributeName = "Rezerve")]
-        public bool Rezerve { get; set; }
+        public bool Dolu { get; set; }
 
         [XmlAttribute(AttributeName = "Gizli")]
         public bool Gizli { get; set; }
@@ -35,6 +32,9 @@ namespace Restoran.Model
 
         [XmlElement(ElementName = "Rezervasyonlar")]
         public ObservableCollection<Rezervasyonlar> Rezervasyonlar { get; set; } = new();
+
+        [XmlAttribute(AttributeName = "Rezerve")]
+        public bool Rezerve { get; set; }
 
         [XmlElement(ElementName = "Siparişler")]
         public ObservableCollection<Siparişler> Siparişler { get; set; } = new();

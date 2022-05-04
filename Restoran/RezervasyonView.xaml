@@ -29,9 +29,6 @@
                     CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="MÜŞTERİ KAYDET"
                     Style="{hc:StaticResource ButtonSuccess}" />
-                <Button Grid.Row="1" HorizontalAlignment="Stretch" Command="hc:ControlCommands.Close"
-                    Content="KAPAT"
-                    Style="{hc:StaticResource ButtonWarning}" />
             </StackPanel>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="REZERVASYONLAR">
@@ -52,8 +49,9 @@
                                     <Run Text="{Binding Soyad}" />
                                     <Run Text="{Binding RezervasyonTarihi}" />
                                 </TextBlock>
-                                <Button Content="SİL" Command="{Binding DataContext. MüşteriSil, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                <Button Command="{Binding DataContext. MüşteriSil, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                     CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Content="SİL"
                                     Style="{hc:StaticResource ButtonDanger}" />
                             </StackPanel>
                         </DataTemplate>
@@ -116,5 +114,12 @@
                 </ScrollViewer>
             </Grid>
         </GroupBox>
+        <Button Grid.ColumnSpan="2" Width="22" Height="22"
+            Margin="0,4,4,0" Padding="0" HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            hc:IconElement.Geometry="{StaticResource ErrorGeometry}"
+            Command="hc:ControlCommands.Close"
+            Foreground="{DynamicResource PrimaryBrush}"
+            Style="{StaticResource ButtonIcon}" />
     </Grid>
 </Border>

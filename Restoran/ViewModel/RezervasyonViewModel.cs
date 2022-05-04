@@ -35,9 +35,9 @@ namespace Restoran.ViewModel
             {
                 if (parameter is MainViewModel mainViewModel)
                 {
-                    mainViewModel.RezervasyonListeleri.Remove(Rezervasyon);
-                    SeçiliMasa.Rezervasyonlar.Remove(Rezervasyon);
-                    if (SeçiliMasa.Rezervasyonlar.All(z=>z.RezervasyonTarihi <= DateTime.Now))
+                    _ = mainViewModel.RezervasyonListeleri.Remove(Rezervasyon);
+                    _ = SeçiliMasa.Rezervasyonlar.Remove(Rezervasyon);
+                    if (SeçiliMasa.Rezervasyonlar.All(z => z.RezervasyonTarihi <= DateTime.Now))
                     {
                         SeçiliMasa.Rezerve = false;
                     }

@@ -88,6 +88,8 @@ namespace Restoran.ViewModel
 
         public Rezervasyonlar Rezervasyonlar { get; set; }
 
+        public ObservableCollection<Rezervasyonlar> RezervasyonListeleri { get; set; }
+
         public RezervasyonViewModel RezervasyonViewModel { get; set; }
 
         public string SalonAdı { get; set; }
@@ -124,7 +126,7 @@ namespace Restoran.ViewModel
 
         public ICommand ÜrünAra { get; set; }
 
-        public string ÜrünAramaMetin { get; set; }
+        public string ÜrünAramaMetin { get; set; } = string.Empty;
 
         public ICommand ÜrünKaydet { get; set; }
 
@@ -137,8 +139,6 @@ namespace Restoran.ViewModel
         public ICommand WebAdreseGit { get; set; }
 
         public IEnumerable<Siparişler> YıllarSiparişDurumu { get; set; }
-
-        public ObservableCollection<Rezervasyonlar> RezervasyonListeleri { get; set; }
 
         public static void DepoKontrol(double adet, double eşik)
         {
