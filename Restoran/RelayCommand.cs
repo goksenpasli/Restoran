@@ -69,9 +69,9 @@ namespace Restoran
         {
         }
 
-        public RelayCommand(Action<T> execute!!, Predicate<T> canExecute)
+        public RelayCommand(Action<T> execute, Predicate<T> canExecute)
         {
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
@@ -105,9 +105,9 @@ namespace Restoran
 
         protected readonly Action execute;
 
-        public RelayCommand(Action execute!!, Func<bool> canExecute)
+        public RelayCommand(Action execute, Func<bool> canExecute)
         {
-            this.execute = execute;
+            this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
             this.canExecute = canExecute;
         }
 
