@@ -411,16 +411,16 @@
                                                     DecimalPlaces="0" IsReadOnly="True" Minimum="0"
                                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                                     Value="{Binding Adet, UpdateSourceTrigger=PropertyChanged}" />
-                                                <hc:ElementGroup>
+                                                <hc:ElementGroup VerticalAlignment="Center">
                                                     <hc:SplitButton HorizontalAlignment="Stretch" Content="İLAVE ÜRÜN">
                                                         <hc:SplitButton.DropDownContent>
                                                             <StackPanel>
                                                                 <hc:NumericUpDown DecimalPlaces="0" Minimum="1"
                                                                     Style="{hc:StaticResource NumericUpDownExtend}"
                                                                     Value="{Binding İlaveÜrünAdeti}" />
-                                                                <MenuItem Command="{Binding İlaveÜrünEkle}"
+                                                                <Button Command="{Binding İlaveÜrünEkle}"
                                                                     CommandParameter="{Binding Mode=OneWay}"
-                                                                    Header="İLAVE ÜRÜN EKLE" />
+                                                                    Content="İLAVE ÜRÜN EKLE" />
                                                             </StackPanel>
                                                         </hc:SplitButton.DropDownContent>
                                                     </hc:SplitButton>
