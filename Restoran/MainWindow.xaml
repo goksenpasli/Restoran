@@ -1,9 +1,8 @@
 ﻿<hc:Window x:Class="Restoran.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:local="clr-namespace:Restoran"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:Restoran" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:Restoran.ViewModel" Title="Restoran"
     d:DataContext="{d:DesignInstance Type={x:Type viewmodel:MainViewModel}}"
     d:Height="800" d:Width="1280" hc:WindowAttach.IsDragElement="True"
@@ -68,7 +67,7 @@
                     </Grid.RowDefinitions>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="4*" />
+                            <RowDefinition Height="3*" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <hc:TransitioningContentControl Margin="2" TransitionMode="Bottom2TopWithFade">
@@ -76,7 +75,7 @@
                                 ItemsSource="{Binding Veriler.Salonlar.Masalar}"
                                 SelectedItem="{Binding Masalar}"
                                 Style="{hc:StaticResource TabControlCapsuleSolid}">
-                                <TabControl.ItemTemplate>
+                                <hc:TabControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel>
                                             <TextBlock Text="{Binding SalonAdı}" />
@@ -88,12 +87,12 @@
                                                 IsChecked="{Binding MasaDurumunuGöster}" />
                                         </StackPanel>
                                     </DataTemplate>
-                                </TabControl.ItemTemplate>
-                                <TabControl.ContentTemplate>
+                                </hc:TabControl.ItemTemplate>
+                                <hc:TabControl.ContentTemplate>
                                     <DataTemplate>
                                         <ContentPresenter Content="{Binding}" ContentTemplate="{DynamicResource MasaDüzen}" />
                                     </DataTemplate>
-                                </TabControl.ContentTemplate>
+                                </hc:TabControl.ContentTemplate>
                             </hc:TabControl>
                         </hc:TransitioningContentControl>
                         <ListBox Grid.Row="1"
@@ -239,7 +238,7 @@
                                     <hc:SearchBar Width="150" hc:InfoElement.Placeholder="ÜRÜN ARA" hc:InfoElement.Title="ÜRÜNLER"
                                         hc:InfoElement.TitlePlacement="Left"
                                         Command="{Binding ÜrünAra}"
-                                        IsRealTime="True" ShowClearButton="True"
+                                        IsRealTime="True"
                                         Style="{StaticResource SearchBarPlusBaseStyle}"
                                         Text="{Binding ÜrünAramaMetin, UpdateSourceTrigger=PropertyChanged}" />
                                     <hc:ComboBox Width="120" hc:InfoElement.Placeholder="KATEGORİ" DisplayMemberPath="Açıklama"
@@ -337,8 +336,7 @@
                                         Text="{Binding Ürün.Açıklama, UpdateSourceTrigger=PropertyChanged}" />
                                     <hc:TextBox hc:InfoElement.Placeholder="ÜRÜN BARKODU YAZIN" hc:InfoElement.Title="ÜRÜN BARKOD"
                                         Text="{Binding Ürün.Barkod, UpdateSourceTrigger=PropertyChanged}" />
-                                    <hc:ComboBox hc:InfoElement.Placeholder="KATEGORİ SEÇİN" hc:InfoElement.Title="KATEGORİ"
-                                        DisplayMemberPath="Açıklama"
+                                    <hc:ComboBox hc:InfoElement.Placeholder="KATEGORİ SEÇİN" hc:InfoElement.Title="KATEGORİ" DisplayMemberPath="Açıklama"
                                         ItemsSource="{Binding Veriler.Kategoriler.Kategori}"
                                         SelectedItem="{Binding SeçiliKategori}" />
                                     <hc:NumericUpDown hc:InfoElement.Title="ALIŞ FİYAT" hc:InfoElement.TitlePlacement="Top" DecimalPlaces="2"
@@ -651,10 +649,10 @@
                     <hc:TransitioningContentControl Grid.Column="2" TransitionMode="Top2Bottom">
                         <GroupBox>
                             <GroupBox.Header>
-                                <hc:SearchBar Width="200" hc:InfoElement.Placeholder="MÜŞERİ ARA" hc:InfoElement.Title="MÜŞTERİ"
+                                <hc:SearchBar Width="200" hc:InfoElement.Placeholder="MÜŞTERİ ARA" hc:InfoElement.Title="MÜŞTERİ"
                                     hc:InfoElement.TitlePlacement="Left"
                                     Command="{Binding MüşteriAra}"
-                                    IsRealTime="True" ShowClearButton="True"
+                                    IsRealTime="True"
                                     Style="{StaticResource SearchBarPlusBaseStyle}"
                                     Text="{Binding MüşteriAramaMetin, UpdateSourceTrigger=PropertyChanged}" />
                             </GroupBox.Header>
